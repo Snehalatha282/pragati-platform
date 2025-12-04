@@ -1,0 +1,264 @@
+<!-- templates/dashboard/home.html -->
+{% extends "templates/layout.html" %}
+
+{% block title %}Dashboard - Pragati{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.home') }}" class="sidebar-link active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="{{ url_for('dashboard.skills') }}" class="sidebar-link">
+                <i class="fas fa-graduation-cap"></i> Skills Development
+            </a>
+            <a href="{{ url_for('jobs.job_listings') }}" class="sidebar-link">
+                <i class="fas fa-briefcase"></i> Job Opportunities
+            </a>
+            <a href="{{ url_for('mentorship.mentor_list') }}" class="sidebar-link">
+                <i class="fas fa-hands-helping"></i> Mentorship
+            </a>
+            <a href="{{ url_for('dashboard.community') }}" class="sidebar-link">
+                <i class="fas fa-users"></i> Community
+            </a>
+            <a href="{{ url_for('dashboard.profile') }}" class="sidebar-link">
+                <i class="fas fa-user"></i> My Profile
+            </a>
+            <a href="{{ url_for('dashboard.settings') }}" class="sidebar-link">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </nav>
+        
+        <div class="sidebar-progress">
+            <h4>Your Progress</h4>
+            <div class="progress">
+                <div class="progress-bar" style="width: 65%"></div>
+            </div>
+            <p class="progress-text">65% Complete</p>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1>Welcome back, {{ current_user.first_name }}! 👋</h1>
+            <p class="welcome-subtitle">Your career re-entry journey is 65% complete. Keep going!</p>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="stat-value">{{ enrolled_courses }}</div>
+                <div class="stat-label">Courses Enrolled</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value">{{ completed_courses }}</div>
+                <div class="stat-label">Courses Completed</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stat-value">{{ job_applications }}</div>
+                <div class="stat-label">Job Applications</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-value">{{ assessments }}</div>
+                <div class="stat-label">Skill Assessments</div>
+            </div>
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Column -->
+            <div class="dashboard-column">
+                <!-- Progress Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Learning Progress</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Recent Courses -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Courses</h3>
+                        <a href="{{ url_for('dashboard.skills') }}" class="btn btn-outline btn-sm">View All</a>
+                    </div>
+                    <div class="card-body">
+                        {% for course in recent_courses %}
+                        <div class="course-item">
+                            <div class="course-info">
+                                <h4>{{ course.course.title }}</h4>
+                                <p>{{ course.course.description[:100] }}...</p>
+                                <div class="course-meta">
+                                    <span class="badge badge-primary">{{ course.course.difficulty|title }}</span>
+                                    <span>{{ course.course.duration_hours }} hours</span>
+                                </div>
+                            </div>
+                            <div class="course-progress">
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: {{ course.progress }}%"></div>
+                                </div>
+                                <span>{{ course.progress }}%</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div class="dashboard-column">
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions-grid">
+                            <a href="{{ url_for('dashboard.skills') }}" class="action-card">
+                                <i class="fas fa-clipboard-check"></i>
+                                <span>Take Skill Assessment</span>
+                            </a>
+                            <a href="{{ url_for('jobs.job_listings') }}" class="action-card">
+                                <i class="fas fa-search"></i>
+                                <span>Find Jobs</span>
+                            </a>
+                            <a href="{{ url_for('mentorship.mentor_list') }}" class="action-card">
+                                <i class="fas fa-hands-helping"></i>
+                                <span>Connect with Mentor</span>
+                            </a>
+                            <a href="{{ url_for('dashboard.community') }}" class="action-card">
+                                <i class="fas fa-comments"></i>
+                                <span>Join Discussion</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommended Jobs -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recommended Jobs</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for job in recommended_jobs %}
+                        <div class="job-item">
+                            <div class="job-info">
+                                <h4>{{ job.title }}</h4>
+                                <p class="company">{{ job.company }}</p>
+                                <div class="job-meta">
+                                    <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                                    <span><i class="fas fa-clock"></i> {{ job.job_type }}</span>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-primary btn-sm">Apply</a>
+                        </div>
+                        {% endfor %}
+                        
+                        {% if not recommended_jobs %}
+                        <div class="empty-state">
+                            <i class="fas fa-briefcase"></i>
+                            <p>Complete your skill assessment to get job recommendations</p>
+                            <a href="{{ url_for('dashboard.skills') }}" class="btn btn-primary">Take Assessment</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Upcoming Events -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Upcoming Events</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="event-item">
+                            <div class="event-date">
+                                <span class="event-day">15</span>
+                                <span class="event-month">JAN</span>
+                            </div>
+                            <div class="event-details">
+                                <h4>Career Comeback Workshop</h4>
+                                <p>Virtual • 2:00 PM - 4:00 PM</p>
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <div class="event-date">
+                                <span class="event-day">18</span>
+                                <span class="event-month">JAN</span>
+                            </div>
+                            <div class="event-details">
+                                <h4>Tech Interview Preparation</h4>
+                                <p>Virtual • 11:00 AM - 1:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Progress Chart
+const ctx = document.getElementById('progressChart').getContext('2d');
+const progressChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ progress_data.labels|tojson }},
+        datasets: [{
+            label: 'Progress',
+            data: {{ progress_data.data|tojson }},
+            borderColor: '#8a2be2',
+            backgroundColor: 'rgba(138, 43, 226, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                    callback: function(value) {
+                        return value + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
