@@ -1,0 +1,234 @@
+{% extends "layout.html" %}
+
+
+{% block title %}Register - Pragati{% endblock %}
+
+{% set hide_nav = false %}
+{% set hide_footer = true %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-side">
+        <div class="auth-side-content">
+            <div class="auth-logo">
+                <i class="fas fa-venus"></i>
+                <span>Pragati</span>
+            </div>
+            <h2>Join Thousands of Women</h2>
+            <ul class="auth-features">
+                <li><i class="fas fa-check-circle"></i> Free skill gap analysis</li>
+                <li><i class="fas fa-check-circle"></i> Personalized learning paths</li>
+                <li><i class="fas fa-check-circle"></i> 1-on-1 mentor matching</li>
+                <li><i class="fas fa-check-circle"></i> Access to flexible jobs</li>
+                <li><i class="fas fa-check-circle"></i> Supportive community network</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Start Your Journey</h1>
+            <p>Create your free account and take the first step toward your career comeback</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" 
+                           id="first_name" 
+                           name="first_name" 
+                           class="form-control" 
+                           placeholder="Jane"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" 
+                           id="last_name" 
+                           name="last_name" 
+                           class="form-control" 
+                           placeholder="Doe"
+                           required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" 
+                       id="email" 
+                       name="email" 
+                       class="form-control" 
+                       placeholder="jane.doe@example.com"
+                       required>
+                <div class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone" class="form-label">Phone Number (Optional)</label>
+                <input type="tel" 
+                       id="phone" 
+                       name="phone" 
+                       class="form-control" 
+                       placeholder="+1 (555) 123-4567">
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" 
+                       id="password" 
+                       name="password" 
+                       class="form-control" 
+                       placeholder="Create a strong password"
+                       required>
+                <div class="password-strength">
+                    <div class="strength-bar"></div>
+                    <span id="password-strength">Password strength</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" 
+                       id="confirm_password" 
+                       name="confirm_password" 
+                       class="form-control" 
+                       placeholder="Re-enter your password"
+                       required>
+            </div>
+            
+            <div class="form-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="terms" required>
+                    <span class="checkmark"></span>
+                    I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="newsletter">
+                    <span class="checkmark"></span>
+                    Send me career tips, success stories, and platform updates
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-user-plus"></i> Create Free Account
+            </button>
+            
+            <div class="auth-divider">
+                <span>or sign up with</span>
+            </div>
+            
+            <div class="social-login">
+                <button type="button" class="btn btn-google">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button type="button" class="btn btn-linkedin">
+                    <i class="fab fa-linkedin"></i> LinkedIn
+                </button>
+            </div>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-bar {
+    height: 4px;
+    background: var(--gray-light);
+    border-radius: 2px;
+    margin-bottom: 0.25rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.strength-bar::before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 0;
+    background: var(--danger-color);
+    transition: width 0.3s, background-color 0.3s;
+}
+
+#password:focus ~ .password-strength .strength-bar::before {
+    width: 25%;
+}
+
+#password:valid ~ .password-strength .strength-bar::before {
+    background: var(--warning-color);
+    width: 50%;
+}
+
+#password:valid[data-strength="good"] ~ .password-strength .strength-bar::before {
+    background: var(--success-color);
+    width: 100%;
+}
+
+#password-strength {
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.auth-form a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.auth-form a:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strengthBar = document.querySelector('.strength-bar');
+    const strengthText = document.getElementById('password-strength');
+    
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    const strengthMap = {
+        0: {text: 'Very Weak', color: '#ef4444', width: '25%'},
+        1: {text: 'Weak', color: '#f59e0b', width: '25%'},
+        2: {text: 'Fair', color: '#f59e0b', width: '50%'},
+        3: {text: 'Good', color: '#10b981', width: '75%'},
+        4: {text: 'Strong', color: '#10b981', width: '100%'}
+    };
+    
+    const current = strengthMap[strength];
+    strengthBar.style.setProperty('--strength-width', current.width);
+    strengthBar.style.setProperty('--strength-color', current.color);
+    strengthText.textContent = current.text;
+    strengthText.style.color = current.color;
+    
+    // Update pseudo-element
+    strengthBar.style.border = 'none';
+    strengthBar.innerHTML = `<div style="width: ${current.width}; background: ${current.color}; height: 100%; border-radius: 2px;"></div>`;
+});
+</script>
+{% endblock %}

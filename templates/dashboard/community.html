@@ -1,0 +1,599 @@
+{% extends "layout.html" %}
+
+
+{% block title %}Community - Pragati{% endblock %}
+
+{% block dashboard_content %}
+<div class="community-header">
+    <h1>Community Forum</h1>
+    <p>Connect, share, and learn with women on similar career journeys</p>
+</div>
+
+<div class="community-container">
+    <!-- Create Post -->
+    <div class="card create-post-card">
+        <div class="card-body">
+            <div class="post-input">
+                <img src="{{ current_user.profile_picture or url_for('static', filename='images/avatar-placeholder.png') }}" 
+                     alt="You" class="user-avatar">
+                <textarea placeholder="Share your thoughts, ask questions, or post resources..." 
+                          rows="3"></textarea>
+            </div>
+            <div class="post-actions">
+                <div class="post-categories">
+                    <select class="form-control">
+                        <option value="">Select Category</option>
+                        <option value="success_story">Success Story</option>
+                        <option value="question">Question</option>
+                        <option value="discussion">Discussion</option>
+                        <option value="resource">Resource</option>
+                        <option value="job_opportunity">Job Opportunity</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary">Post to Community</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="categories-grid">
+        <a href="#" class="category-card" data-category="success_story">
+            <div class="category-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h3>Success Stories</h3>
+            <p>Celebrate achievements and share inspiration</p>
+        </a>
+        
+        <a href="#" class="category-card" data-category="question">
+            <div class="category-icon">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <h3>Questions</h3>
+            <p>Ask for advice and get answers</p>
+        </a>
+        
+        <a href="#" class="category-card" data-category="discussion">
+            <div class="category-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h3>Discussions</h3>
+            <p>Join conversations on career topics</p>
+        </a>
+        
+        <a href="#" class="category-card" data-category="resource">
+            <div class="category-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <h3>Resources</h3>
+            <p>Share helpful links and tools</p>
+        </a>
+        
+        <a href="#" class="category-card" data-category="job_opportunity">
+            <div class="category-icon">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <h3>Job Opportunities</h3>
+            <p>Post and discover job leads</p>
+        </a>
+        
+        <a href="#" class="category-card" data-category="support">
+            <div class="category-icon">
+                <i class="fas fa-heart"></i>
+            </div>
+            <h3>Support</h3>
+            <p>Find encouragement and motivation</p>
+        </a>
+    </div>
+
+    <!-- Recent Posts -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Recent Discussions</h2>
+            <div class="view-options">
+                <button class="view-option active" data-view="all">All Posts</button>
+                <button class="view-option" data-view="following">Following</button>
+                <button class="view-option" data-view="trending">Trending</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="posts-list">
+                <!-- Post 1 -->
+                <div class="post-item">
+                    <div class="post-header">
+                        <img src="{{ url_for('static', filename='images/avatar-placeholder.png') }}" 
+                             alt="User" class="post-avatar">
+                        <div class="post-user-info">
+                            <h4>Priya Sharma</h4>
+                            <p>Former Software Engineer • 3 hours ago</p>
+                        </div>
+                        <span class="post-category">Success Story</span>
+                    </div>
+                    
+                    <div class="post-content">
+                        <h3>Landing my first job after a 3-year break!</h3>
+                        <p>After my maternity break, I thought my tech skills were outdated. But with Pragati's courses and mentor support, I landed a remote developer role in just 8 weeks! The key was focusing on modern frameworks and building a portfolio project...</p>
+                    </div>
+                    
+                    <div class="post-stats">
+                        <button class="stat-btn">
+                            <i class="fas fa-heart"></i> 42
+                        </button>
+                        <button class="stat-btn">
+                            <i class="fas fa-comment"></i> 18
+                        </button>
+                        <button class="stat-btn">
+                            <i class="fas fa-share"></i> Share
+                        </button>
+                    </div>
+                    
+                    <div class="post-comments">
+                        <div class="comment-input">
+                            <input type="text" placeholder="Write a comment...">
+                            <button class="btn btn-primary btn-sm">Post</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post 2 -->
+                <div class="post-item">
+                    <div class="post-header">
+                        <img src="{{ url_for('static', filename='images/avatar-placeholder.png') }}" 
+                             alt="User" class="post-avatar">
+                        <div class="post-user-info">
+                            <h4>Anita Patel</h4>
+                            <p>Marketing Professional • 1 day ago</p>
+                        </div>
+                        <span class="post-category">Question</span>
+                    </div>
+                    
+                    <div class="post-content">
+                        <h3>How to update resume after long break?</h3>
+                        <p>I've been out of the workforce for 5 years raising kids. How do I present this gap positively on my resume? Should I mention freelance work during this period or focus on skills gained?</p>
+                    </div>
+                    
+                    <div class="post-stats">
+                        <button class="stat-btn">
+                            <i class="fas fa-heart"></i> 28
+                        </button>
+                        <button class="stat-btn">
+                            <i class="fas fa-comment"></i> 32
+                        </button>
+                        <button class="stat-btn">
+                            <i class="fas fa-share"></i> Share
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Post 3 -->
+                <div class="post-item">
+                    <div class="post-header">
+                        <img src="{{ url_for('static', filename='images/avatar-placeholder.png') }}" 
+                             alt="User" class="post-avatar">
+                        <div class="post-user-info">
+                            <h4>Meera Reddy</h4>
+                            <p>HR Manager • 2 days ago</p>
+                        </div>
+                        <span class="post-category">Resource</span>
+                    </div>
+                    
+                    <div class="post-content">
+                        <h3>Free resume templates for career returners</h3>
+                        <p>I found these amazing free resume templates specifically designed for people with career gaps. They highlight transferable skills and present breaks positively. Link in comments!</p>
+                    </div>
+                    
+                    <div class="post-stats">
+                        <button class="stat-btn">
+                            <i class="fas fa-heart"></i> 56
+                        </button>
+                        <button class="stat-btn">
+                            <i class="fas fa-comment"></i> 14
+                        </button>
+                        <button class="stat-btn">
+                            <i class="fas fa-share"></i> Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="#" class="btn btn-outline">Load More Posts</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community Stats -->
+    <div class="community-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>5,000+ Members</h3>
+                <p>Women supporting each other</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="stat-content">
+                <h3>10,000+ Discussions</h3>
+                <p>Active conversations daily</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-handshake"></i>
+            </div>
+            <div class="stat-content">
+                <h3>95% Support Rate</h3>
+                <p>Questions get answered quickly</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.community-header {
+    margin-bottom: 2rem;
+}
+
+.community-header h1 {
+    font-size: 2rem;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.community-header p {
+    color: var(--gray-dark);
+}
+
+.create-post-card {
+    margin-bottom: 2rem;
+}
+
+.post-input {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.post-input .user-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.post-input textarea {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    resize: none;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.post-input textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-categories {
+    width: 200px;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--dark-color);
+    transition: all 0.3s;
+}
+
+.category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--primary-light);
+}
+
+.category-icon {
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.category-card h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+}
+
+.category-card p {
+    color: var(--gray);
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.view-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-option {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gray-light);
+    background: none;
+    border-radius: var(--radius);
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.view-option.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.post-item {
+    padding: 1.5rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    transition: all 0.3s;
+}
+
+.post-item:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-sm);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.post-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.post-user-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+}
+
+.post-user-info p {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+.post-category {
+    margin-left: auto;
+    padding: 0.25rem 0.75rem;
+    background: rgba(138, 43, 226, 0.1);
+    color: var(--primary-color);
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.post-content h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+    color: var(--dark-color);
+}
+
+.post-content p {
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+.post-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-light);
+}
+
+.stat-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gray-light);
+    background: none;
+    border-radius: var(--radius);
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.stat-btn:hover {
+    background: var(--light-color);
+    border-color: var(--gray);
+}
+
+.stat-btn i {
+    color: var(--primary-color);
+}
+
+.post-comments {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-light);
+}
+
+.comment-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.comment-input input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+}
+
+.community-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .post-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .post-categories {
+        width: 100%;
+    }
+    
+    .view-options {
+        flex-wrap: wrap;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter posts by view
+    const viewOptions = document.querySelectorAll('.view-option');
+    const postItems = document.querySelectorAll('.post-item');
+    
+    viewOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove active class from all options
+            viewOptions.forEach(opt => opt.classList.remove('active'));
+            // Add active class to clicked option
+            this.classList.add('active');
+            
+            const view = this.getAttribute('data-view');
+            
+            // Filter posts based on view
+            // This is a simplified example - in production, you would fetch filtered posts from the server
+            if (view === 'all') {
+                postItems.forEach(post => post.style.display = 'block');
+            } else {
+                // Simulate filtering
+                postItems.forEach(post => {
+                    const random = Math.random();
+                    post.style.display = random > 0.5 ? 'block' : 'none';
+                });
+            }
+        });
+    });
+    
+    // Like button functionality
+    const likeButtons = document.querySelectorAll('.stat-btn');
+    likeButtons.forEach(button => {
+        if (button.querySelector('.fa-heart')) {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const count = this.querySelector('span') || this.lastChild;
+                
+                if (icon.classList.contains('fas')) {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    // Decrease count
+                    if (count.textContent) {
+                        const current = parseInt(count.textContent);
+                        count.textContent = current - 1;
+                    }
+                } else {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    // Increase count
+                    if (count.textContent) {
+                        const current = parseInt(count.textContent);
+                        count.textContent = current + 1;
+                    }
+                }
+            });
+        }
+    });
+    
+    // Category filtering
+    const categoryCards = document.querySelectorAll('.category-card');
+    categoryCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.getAttribute('data-category');
+            
+            // Highlight selected category
+            categoryCards.forEach(c => c.style.borderColor = 'var(--gray-light)');
+            this.style.borderColor = 'var(--primary-color)';
+            
+            // Filter posts by category
+            const categoryBadges = document.querySelectorAll('.post-category');
+            postItems.forEach((post, index) => {
+                if (category === 'all') {
+                    post.style.display = 'block';
+                } else {
+                    const badge = categoryBadges[index];
+                    if (badge.textContent.toLowerCase().includes(category.replace('_', ' '))) {
+                        post.style.display = 'block';
+                    } else {
+                        post.style.display = 'none';
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

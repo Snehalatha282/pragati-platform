@@ -1,0 +1,518 @@
+{% extends "dashboard/base.html" %}
+
+
+{% block title %}Mentorship - Pragati{% endblock %}
+
+{% block dashboard_content %}
+<div class="mentorship-header">
+    <div class="header-content">
+        <h1>Find Your Mentor</h1>
+        <p>Connect with experienced professionals who can guide your career comeback</p>
+    </div>
+    <div class="header-actions">
+        <a href="{{ url_for('mentorship.my_connections') }}" class="btn btn-outline">
+            <i class="fas fa-users"></i> My Connections
+        </a>
+        {% if current_user.role != 'mentor' %}
+        <a href="{{ url_for('mentorship.become_mentor') }}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Become a Mentor
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Mentorship Stats -->
+<div class="mentorship-stats">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-hands-helping"></i>
+        </div>
+        <div class="stat-content">
+            <h3>150+ Mentors</h3>
+            <p>Industry experts across various fields</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <h3>95% Response Rate</h3>
+            <p>Mentors typically respond within 24 hours</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-star"></i>
+        </div>
+        <div class="stat-content">
+            <h3>4.8/5 Rating</h3>
+            <p>Average mentor satisfaction score</p>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Requests (for mentors) -->
+{% if current_user.role == 'mentor' and pending_requests %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Pending Connection Requests</h2>
+    </div>
+    <div class="card-body">
+        <div class="requests-list">
+            {% for request in pending_requests %}
+            <div class="request-item">
+                <div class="request-user">
+                    <img src="{{ request.mentee.profile_picture or url_for('static', filename='images/avatar-placeholder.png') }}" 
+                         alt="{{ request.mentee.first_name }}" class="user-avatar">
+                    <div class="user-info">
+                        <h4>{{ request.mentee.first_name }} {{ request.mentee.last_name }}</h4>
+                        <p>{{ request.mentee.desired_role or 'Career Returner' }}</p>
+                    </div>
+                </div>
+                <div class="request-message">
+                    <p>Wants to connect for mentorship</p>
+                    <small>Requested {{ request.created_at.strftime('%b %d') }}</small>
+                </div>
+                <div class="request-actions">
+                    <form method="POST" action="{{ url_for('mentorship.handle_request', request_id=request.id, action='accept') }}">
+                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('mentorship.handle_request', request_id=request.id, action='reject') }}">
+                        <button type="submit" class="btn btn-outline btn-sm">Decline</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Mentor Search -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Available Mentors</h2>
+        <div class="mentor-search">
+            <input type="text" id="mentorSearch" placeholder="Search by name, skills, or industry...">
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mentors-grid">
+            {% for mentor in mentors %}
+            <div class="mentor-card">
+                <div class="mentor-header">
+                    <img src="{{ mentor.profile_picture or url_for('static', filename='images/avatar-placeholder.png') }}" 
+                         alt="{{ mentor.first_name }}" class="mentor-avatar">
+                    <div class="mentor-info">
+                        <h3>{{ mentor.first_name }} {{ mentor.last_name }}</h3>
+                        <p class="mentor-title">{{ mentor.previous_role or 'Industry Expert' }}</p>
+                        <div class="mentor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>4.7</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mentor-skills">
+                    {% if mentor.skills %}
+                    {% set skills = mentor.skills.split(',')[:3] %}
+                    {% for skill in skills %}
+                    <span class="skill-tag">{{ skill.strip() }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <div class="mentor-bio">
+                    <p>{{ mentor.bio[:100] or 'Experienced professional with expertise in career development...' }}{% if mentor.bio and mentor.bio|length > 100 %}...{% endif %}</p>
+                </div>
+                
+                <div class="mentor-stats">
+                    <div class="stat">
+                        <i class="fas fa-users"></i>
+                        <span>25+ mentees</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-clock"></i>
+                        <span>5+ years exp</span>
+                    </div>
+                </div>
+                
+                <div class="mentor-actions">
+                    {% set is_connected = false %}
+                    {% for conn in connections %}
+                        {% if conn.mentor_id == mentor.id %}
+                            {% set is_connected = true %}
+                            {% if conn.status == 'accepted' %}
+                            <span class="badge badge-success">Connected</span>
+                            {% elif conn.status == 'pending' %}
+                            <span class="badge badge-warning">Request Sent</span>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if not is_connected %}
+                    <form method="POST" action="{{ url_for('mentorship.connect_mentor', mentor_id=mentor.id) }}">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-user-plus"></i> Connect
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- How Mentorship Works -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">How Mentorship Works</h2>
+    </div>
+    <div class="card-body">
+        <div class="mentorship-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Find a Mentor</h3>
+                    <p>Browse profiles and find mentors whose experience matches your career goals.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Send Connection Request</h3>
+                    <p>Send a personalized request explaining what you hope to gain from the mentorship.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Schedule Sessions</h3>
+                    <p>Once connected, schedule regular video calls or meetings with your mentor.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Track Progress</h3>
+                    <p>Set goals, track milestones, and celebrate achievements together.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.mentorship-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.mentorship-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.stat-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-content h3 {
+    font-size: 1.5rem;
+    color: var(--dark-color);
+    margin-bottom: 0.25rem;
+}
+
+.stat-content p {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+.mentor-search {
+    position: relative;
+    max-width: 300px;
+}
+
+.mentor-search input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+}
+
+.mentor-search i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+}
+
+.requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.request-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+}
+
+.request-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+}
+
+.user-info p {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+.request-message p {
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+}
+
+.request-message small {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+.request-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.mentors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.mentor-card {
+    background: white;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: all 0.3s;
+}
+
+.mentor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.mentor-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.mentor-avatar {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-light);
+}
+
+.mentor-info h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+}
+
+.mentor-title {
+    color: var(--gray);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.mentor-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.mentor-rating i {
+    color: #fbbf24;
+    font-size: 0.875rem;
+}
+
+.mentor-rating span {
+    margin-left: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.mentor-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.mentor-bio {
+    margin-bottom: 1rem;
+    color: var(--gray-dark);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.mentor-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.mentor-stats .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.mentorship-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.step {
+    text-align: center;
+}
+
+.step-number {
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 auto 1rem;
+}
+
+.step-content h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.step-content p {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .mentors-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .request-item {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .request-user {
+        justify-content: center;
+    }
+    
+    .request-actions {
+        justify-content: center;
+    }
+    
+    .mentorship-steps {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search mentors
+    const searchInput = document.getElementById('mentorSearch');
+    const mentorCards = document.querySelectorAll('.mentor-card');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            mentorCards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const title = card.querySelector('.mentor-title').textContent.toLowerCase();
+                const skills = card.querySelector('.mentor-skills').textContent.toLowerCase();
+                const bio = card.querySelector('.mentor-bio').textContent.toLowerCase();
+                
+                const matches = name.includes(searchTerm) || 
+                               title.includes(searchTerm) || 
+                               skills.includes(searchTerm) || 
+                               bio.includes(searchTerm);
+                
+                card.style.display = matches ? 'block' : 'none';
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

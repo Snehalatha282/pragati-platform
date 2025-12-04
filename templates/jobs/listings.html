@@ -1,0 +1,506 @@
+{% extends "layout.html" %}
+
+
+{% block title %}Job Opportunities - Pragati{% endblock %}
+
+{% block dashboard_content %}
+<div class="jobs-header">
+    <div class="header-content">
+        <h1>Job Opportunities</h1>
+        <p>Find flexible roles that match your skills and career goals</p>
+    </div>
+    <div class="header-actions">
+        <a href="{{ url_for('jobs.my_applications') }}" class="btn btn-outline">
+            <i class="fas fa-file-alt"></i> My Applications
+        </a>
+        <button class="btn btn-primary" id="filterToggle">
+            <i class="fas fa-filter"></i> Filters
+        </button>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-card" id="filtersPanel">
+    <form method="GET" class="filters-form">
+        <div class="filter-group">
+            <label class="filter-label">Job Type</label>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="radio" name="type" value="" {% if not current_filters.type %}checked{% endif %}>
+                    <span>All Types</span>
+                </label>
+                {% for type in job_types %}
+                <label class="filter-option">
+                    <input type="radio" name="type" value="{{ type }}" {% if current_filters.type == type %}checked{% endif %}>
+                    <span>{{ type }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="filter-row">
+            <div class="filter-field">
+                <label class="filter-label">Location</label>
+                <input type="text" 
+                       name="location" 
+                       class="form-control" 
+                       placeholder="City, State, or Remote"
+                       value="{{ current_filters.location }}">
+            </div>
+            
+            <div class="filter-field">
+                <label class="filter-label">Search Keywords</label>
+                <input type="text" 
+                       name="search" 
+                       class="form-control" 
+                       placeholder="Job title, company, or skills"
+                       value="{{ current_filters.search }}">
+            </div>
+            
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <a href="{{ url_for('jobs.job_listings') }}" class="btn btn-outline">
+                    Clear Filters
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Jobs List -->
+<div class="jobs-container">
+    {% if jobs.items %}
+    <div class="jobs-list">
+        {% for job in jobs.items %}
+        <div class="job-card">
+            <div class="job-header">
+                <div class="job-info">
+                    <h3>
+                        <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}">{{ job.title }}</a>
+                    </h3>
+                    <p class="company">{{ job.company }}</p>
+                    <div class="job-meta">
+                        <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                        <span><i class="fas fa-clock"></i> {{ job.job_type }}</span>
+                        <span><i class="fas fa-calendar"></i> Posted {{ job.posted_at.strftime('%b %d') }}</span>
+                    </div>
+                </div>
+                <div class="job-actions">
+                    {% if job.id in applied_job_ids %}
+                    <span class="badge badge-success">Applied</span>
+                    {% else %}
+                    <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" class="btn btn-primary btn-sm">
+                        Apply Now
+                    </a>
+                    {% endif %}
+                    <button class="btn btn-outline btn-sm save-job" data-job-id="{{ job.id }}">
+                        <i class="fas fa-bookmark"></i> Save
+                    </button>
+                </div>
+            </div>
+            
+            <div class="job-description">
+                <p>{{ job.description[:200] }}{% if job.description|length > 200 %}...{% endif %}</p>
+            </div>
+            
+            <div class="job-skills">
+                {% if job.skills_required %}
+                {% set skills = job.skills_required.split(',') %}
+                {% for skill in skills[:5] %}
+                <span class="skill-tag">{{ skill.strip() }}</span>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if jobs.pages > 1 %}
+    <div class="pagination">
+        {% if jobs.has_prev %}
+        <a href="{{ url_for('jobs.job_listings', page=jobs.prev_num, **current_filters) }}" class="page-link">
+            <i class="fas fa-chevron-left"></i> Previous
+        </a>
+        {% endif %}
+        
+        <div class="page-numbers">
+            {% for page_num in jobs.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+                {% if page_num %}
+                    {% if page_num == jobs.page %}
+                    <span class="page-number active">{{ page_num }}</span>
+                    {% else %}
+                    <a href="{{ url_for('jobs.job_listings', page=page_num, **current_filters) }}" class="page-number">
+                        {{ page_num }}
+                    </a>
+                    {% endif %}
+                {% else %}
+                    <span class="page-dots">...</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        {% if jobs.has_next %}
+        <a href="{{ url_for('jobs.job_listings', page=jobs.next_num, **current_filters) }}" class="page-link">
+            Next <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-briefcase"></i>
+        <h3>No jobs found</h3>
+        <p>Try adjusting your filters or check back later for new opportunities.</p>
+        <a href="{{ url_for('jobs.job_listings') }}" class="btn btn-primary">Clear Filters</a>
+    </div>
+    {% endif %}
+    
+    <!-- Job Stats -->
+    <div class="job-stats">
+        <div class="stat-card">
+            <i class="fas fa-briefcase"></i>
+            <div class="stat-content">
+                <h4>{{ jobs.total }} Jobs Available</h4>
+                <p>Flexible roles across various industries</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-clock"></i>
+            <div class="stat-content">
+                <h4>80% Remote/Flexible</h4>
+                <p>Most positions offer work flexibility</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-users"></i>
+            <div class="stat-content">
+                <h4>Career Re-entry Friendly</h4>
+                <p>Companies committed to supporting returners</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.jobs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-content h1 {
+    font-size: 2rem;
+    color: var(--dark-color);
+    margin-bottom: 0.25rem;
+}
+
+.header-content p {
+    color: var(--gray-dark);
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.filters-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--dark-color);
+}
+
+.filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.filter-option input {
+    margin-right: 0.5rem;
+}
+
+.filter-option span {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    transition: all 0.3s;
+}
+
+.filter-option input:checked + span {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.filter-field {
+    margin-bottom: 0;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.jobs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.job-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    transition: all 0.3s;
+}
+
+.job-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.job-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.job-info h3 a {
+    color: var(--dark-color);
+    text-decoration: none;
+}
+
+.job-info h3 a:hover {
+    color: var(--primary-color);
+}
+
+.company {
+    color: var(--gray-dark);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.job-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.job-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.job-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.job-description {
+    margin-bottom: 1rem;
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+.job-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--gray-light);
+    margin-top: 1.5rem;
+}
+
+.page-link {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    color: var(--dark-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-link:hover {
+    background: var(--light-color);
+}
+
+.page-numbers {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.page-number {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    color: var(--dark-color);
+    text-decoration: none;
+}
+
+.page-number.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.page-number:not(.active):hover {
+    background: var(--light-color);
+}
+
+.page-dots {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    color: var(--gray);
+}
+
+.job-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.stat-card i {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.stat-content h4 {
+    font-size: 1.125rem;
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+}
+
+.stat-content p {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .job-header {
+        flex-direction: column;
+    }
+    
+    .job-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .pagination {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle filters
+    const filterToggle = document.getElementById('filterToggle');
+    const filtersPanel = document.getElementById('filtersPanel');
+    
+    if (filterToggle) {
+        filterToggle.addEventListener('click', () => {
+            filtersPanel.style.display = filtersPanel.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+    
+    // Save job
+    const saveButtons = document.querySelectorAll('.save-job');
+    saveButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const jobId = this.getAttribute('data-job-id');
+            fetch(`/jobs/save/${jobId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.innerHTML = '<i class="fas fa-check"></i> Saved';
+                    this.classList.remove('btn-outline');
+                    this.classList.add('btn-success');
+                    this.disabled = true;
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

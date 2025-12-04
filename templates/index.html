@@ -1,0 +1,705 @@
+<!-- templates/index.html -->
+{% extends "layout.html" %}
+
+
+{% block title %}Pragati - Women Career Re-Entry Empowerment Platform{% endblock %}
+
+{% set hide_nav = true %}
+{% set hide_footer = false %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Restart Your Career With Confidence</h1>
+        <p class="hero-subtitle">Pragati empowers women returning to work with personalized skills development, mentorship, and flexible job opportunities.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-rocket"></i> Start Your Journey
+            </a>
+            <a href="#how-it-works" class="btn btn-outline btn-lg">
+                <i class="fas fa-play-circle"></i> How It Works
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-section" id="statistics">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why Pragati Matters</h2>
+            <p>Every year, thousands of talented women pause their careers—we help them restart stronger.</p>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-count="33">0</div>
+                <div class="stat-label">of women experience career breaks</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="60">0</div>
+                <div class="stat-label">struggle to re-enter within a year</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="85">0</div>
+                <div class="stat-label">report skill gaps after break</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="92">0</div>
+                <div class="stat-label">success rate with mentorship</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section" id="features">
+    <div class="container">
+        <div class="section-header">
+            <h2>Everything You Need to Succeed</h2>
+            <p>Pragati provides a complete ecosystem for your career comeback</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Skill Assessment</h3>
+                <p>Identify your strengths and gaps with AI-powered assessments tailored to today's job market.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>Personalized Learning</h3>
+                <p>Access curated courses and upskilling paths based on your career goals and assessment results.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3>Mentorship</h3>
+                <p>Connect with industry mentors who've successfully navigated career breaks and can guide your journey.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h3>Job Matching</h3>
+                <p>Find flexible opportunities from companies committed to supporting career re-entry candidates.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Community</h3>
+                <p>Join a supportive network of women sharing experiences, resources, and encouragement.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Progress Tracking</h3>
+                <p>Monitor your growth with detailed analytics and milestone celebrations throughout your journey.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works" id="how-it-works">
+    <div class="container">
+        <div class="section-header">
+            <h2>Your Journey in 4 Simple Steps</h2>
+            <p>From assessment to employment, we guide you every step of the way</p>
+        </div>
+        <div class="steps-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Register & Assess</h3>
+                    <p>Create your profile and complete our comprehensive skill assessment to identify your starting point.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Personalize Your Path</h3>
+                    <p>Receive a customized learning plan with courses, resources, and skill-building activities.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Connect & Grow</h3>
+                    <p>Join mentorship sessions, community discussions, and networking events to build confidence.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Apply & Succeed</h3>
+                    <p>Access curated job opportunities, receive application support, and land your ideal role.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success Stories -->
+<section class="success-stories" id="success-stories">
+    <div class="container">
+        <div class="section-header">
+            <h2>Success Stories</h2>
+            <p>Real women, real career comebacks</p>
+        </div>
+        <div class="stories-grid">
+            <div class="story-card">
+                <div class="story-image">
+                    <img src="{{ url_for('static', filename='images/story1.jpg') }}" alt="Priya's Story">
+                </div>
+                <div class="story-content">
+                    <h3>Priya's Tech Comeback</h3>
+                    <p class="story-meta">Software Engineer • 3-year break</p>
+                    <p class="story-excerpt">"After my maternity break, I felt completely outdated. Pragati helped me bridge my skill gaps and connect with a mentor. Within 8 weeks, I landed a remote developer role!"</p>
+                    <div class="story-stats">
+                        <span><i class="fas fa-clock"></i> 8 weeks to employment</span>
+                        <span><i class="fas fa-percentage"></i> 40% salary increase</span>
+                    </div>
+                </div>
+            </div>
+            <div class="story-card">
+                <div class="story-image">
+                    <img src="{{ url_for('static', filename='images/story2.jpg') }}" alt="Anita's Story">
+                </div>
+                <div class="story-content">
+                    <h3>Anita's Marketing Return</h3>
+                    <p class="story-meta">Marketing Manager • 5-year break</p>
+                    <p class="story-excerpt">"The digital marketing landscape had completely changed during my career break. Pragati's courses and community support gave me the confidence to start my own consultancy."</p>
+                    <div class="story-stats">
+                        <span><i class="fas fa-clock"></i> 12 weeks to consultancy</span>
+                        <span><i class="fas fa-users"></i> 5 ongoing clients</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Restart Your Career?</h2>
+            <p>Join thousands of women who've successfully returned to work with Pragati's support.</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-xl">
+                    <i class="fas fa-user-plus"></i> Join Free Today
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-xl">
+                    <i class="fas fa-sign-in-alt"></i> Existing User? Login
+                </a>
+            </div>
+            <div class="cta-features">
+                <span><i class="fas fa-check"></i> No credit card required</span>
+                <span><i class="fas fa-check"></i> Free forever plan</span>
+                <span><i class="fas fa-check"></i> Personalized from day one</span>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Additional landing page styles */
+.hero {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.9), rgba(236, 72, 153, 0.9)),
+                url("{{ url_for('static', filename='images/hero-bg.jpg') }}") center/cover;
+    color: white;
+    padding: 8rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.hero h1 {
+    font-family: var(--font-secondary);
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn-xl {
+    padding: 1.25rem 2.5rem;
+    font-size: 1.25rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+    font-family: var(--font-secondary);
+}
+
+.section-header p {
+    color: var(--gray-dark);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Statistics Section */
+.stats-section {
+    padding: 6rem 1.5rem;
+    background: var(--light-color);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-secondary);
+}
+
+.stat-label {
+    color: var(--gray-dark);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Features Section */
+.features-section {
+    padding: 6rem 1.5rem;
+    background: white;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    background: white;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.feature-icon {
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.feature-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+}
+
+.feature-card p {
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+/* How It Works Section */
+.how-it-works {
+    padding: 6rem 1.5rem;
+    background: var(--light-color);
+}
+
+.steps-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.step:last-child {
+    margin-bottom: 0;
+}
+
+.step-number {
+    width: 3.5rem;
+    height: 3.5rem;
+    background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.step-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--dark-color);
+}
+
+.step-content p {
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+/* Success Stories */
+.success-stories {
+    padding: 6rem 1.5rem;
+    background: white;
+}
+
+.stories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.story-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s;
+}
+
+.story-card:hover {
+    transform: translateY(-5px);
+}
+
+.story-image {
+    height: 200px;
+    overflow: hidden;
+}
+
+.story-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.story-card:hover .story-image img {
+    transform: scale(1.05);
+}
+
+.story-content {
+    padding: 2rem;
+}
+
+.story-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.story-meta {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.story-excerpt {
+    color: var(--gray-dark);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.story-stats {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.story-stats span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 6rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-secondary);
+}
+
+.cta-content p {
+    font-size: 1.25rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.cta-features {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.cta-features span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.9;
+}
+
+/* Statistics Counter Animation */
+.stat-number {
+    display: inline-block;
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero {
+        padding: 4rem 1.5rem;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .section-header h2 {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+    }
+    
+    .step {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .step-number {
+        margin: 0 auto;
+    }
+    
+    .stories-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-features {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .btn-lg, .btn-xl {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animate statistics counters
+document.addEventListener('DOMContentLoaded', function() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    
+    // Function to animate counter
+    function animateCounter(element, target) {
+        let current = 0;
+        const increment = target / 50; // Divide into 50 steps
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            element.textContent = Math.round(current) + (element.getAttribute('data-count') === '33' ? '%' : '%');
+        }, 40);
+    }
+    
+    // Intersection Observer for scroll-triggered animation
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const element = entry.target;
+                const target = parseInt(element.getAttribute('data-count'));
+                
+                // Reset to 0 and animate
+                element.textContent = '0';
+                element.style.animation = 'countUp 0.5s ease forwards';
+                
+                // Start counter animation after a brief delay
+                setTimeout(() => {
+                    animateCounter(element, target);
+                }, 300);
+                
+                // Stop observing after animation starts
+                observer.unobserve(element);
+            }
+        });
+    }, {
+        threshold: 0.5,
+        rootMargin: '0px 0px -50px 0px'
+    });
+    
+    // Observe all stat numbers
+    statNumbers.forEach(stat => {
+        observer.observe(stat);
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

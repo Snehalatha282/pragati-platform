@@ -1,0 +1,106 @@
+# routes/mentorship.py
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask_login import login_required, current_user
+from models import db, User, MentorConnection
+from datetime import datetime
+
+mentorship_bp = Blueprint('mentorship', __name__, url_prefix='/mentorship')
+
+@mentorship_bp.route('/')
+@login_required
+def mentor_list():
+    # Get available mentors
+    mentors = User.query.filter(
+        User.role == 'mentor',
+        User.is_active == True
+    ).all()
+    
+    # Get user's mentor connections
+    connections = MentorConnection.query.filter_by(
+        mentee_id=current_user.id
+    ).all()
+    
+    # Get pending requests
+    pending_requests = MentorConnection.query.filter_by(
+        mentor_id=current_user.id,
+        status='pending'
+    ).all() if current_user.role == 'mentor' else []
+    
+    return render_template('mentorship/list.html',
+                         mentors=mentors,
+                         connections=connections,
+                         pending_requests=pending_requests)
+
+@mentorship_bp.route('/connect/<int:mentor_id>', methods=['POST'])
+@login_required
+def connect_mentor(mentor_id):
+    mentor = User.query.get_or_404(mentor_id)
+    
+    # Check if already connected
+    existing = MentorConnection.query.filter_by(
+        mentor_id=mentor_id,
+        mentee_id=current_user.id
+    ).first()
+    
+    if existing:
+        flash('You have already sent a connection request to this mentor.', 'warning')
+        return redirect(url_for('mentorship.mentor_list'))
+    
+    # Create connection request
+    connection = MentorConnection(
+        mentor_id=mentor_id,
+        mentee_id=current_user.id,
+        status='pending',
+        created_at=datetime.utcnow()
+    )
+    
+    db.session.add(connection)
+    db.session.commit()
+    
+    flash('Connection request sent successfully!', 'success')
+    return redirect(url_for('mentorship.mentor_list'))
+
+@mentorship_bp.route('/connections')
+@login_required
+def my_connections():
+    connections = MentorConnection.query.filter(
+        (MentorConnection.mentee_id == current_user.id) |
+        (MentorConnection.mentor_id == current_user.id)
+    ).all()
+    
+    return render_template('mentorship/connections.html',
+                         connections=connections)
+
+@mentorship_bp.route('/request/<int:request_id>/<action>', methods=['POST'])
+@login_required
+def handle_request(request_id, action):
+    connection = MentorConnection.query.get_or_404(request_id)
+    
+    if connection.mentor_id != current_user.id:
+        flash('Unauthorized action.', 'error')
+        return redirect(url_for('mentorship.mentor_list'))
+    
+    if action == 'accept':
+        connection.status = 'accepted'
+        flash('Connection request accepted.', 'success')
+    elif action == 'reject':
+        connection.status = 'rejected'
+        flash('Connection request rejected.', 'info')
+    
+    db.session.commit()
+    return redirect(url_for('mentorship.mentor_list'))
+
+@mentorship_bp.route('/become-mentor', methods=['GET', 'POST'])
+@login_required
+def become_mentor():
+    if request.method == 'POST':
+        # Update user role to mentor
+        current_user.role = 'mentor'
+        current_user.bio = request.form.get('bio', '')
+        current_user.skills = request.form.get('skills', '')
+        
+        db.session.commit()
+        flash('Congratulations! You are now a mentor on Pragati.', 'success')
+        return redirect(url_for('mentorship.mentor_list'))
+    
+    return render_template('mentorship/become_mentor.html')
