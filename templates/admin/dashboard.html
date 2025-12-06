@@ -1,168 +1,148 @@
-{% extends "base.html" %}
-
-{% block title %}Admin Dashboard &mdash; Pragati{% endblock %}
+{% extends "admin/layout.html" %}
 
 {% block content %}
-<div class="row mb-5">
-    <div class="col-12">
-        <h1 class="display-4 text-primary font-weight-bold">Admin Dashboard</h1>
-        <p class="lead text-muted">Platform Overview & Management</p>
-    </div>
+<div class="page-header">
+    <h1 class="page-title">Admin Dashboard</h1>
+    <button class="btn-primary">
+        <i class="fas fa-plus"></i> Add Content
+    </button>
 </div>
 
-<!-- Stats Row -->
-<div class="row mb-5">
+<!-- Stats Grid -->
+<div class="stats-grid">
     <!-- Total Users -->
-    <div class="col-md-4">
-        <div class="card shadow-sm border-0 h-100"
-            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <div class="card-body text-center p-4">
-                <i class="fas fa-users fa-3x mb-3 opacity-50"></i>
-                <h3 class="display-4 font-weight-bold">{{ total_users }}</h3>
-                <p class="mb-0 text-white-50">Total Users</p>
-            </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-label">Total Users</span>
+            <i class="fas fa-users stat-icon icon-purple"></i>
+        </div>
+        <div class="stat-value">{{ stats.total_users }}</div>
+        <div class="stat-growth">
+            <i class="fas fa-arrow-up"></i> 12% this month
         </div>
     </div>
-    <!-- Total Verified Mentors -->
-    <div class="col-md-4">
-        <div class="card shadow-sm border-0 h-100"
-            style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;">
-            <div class="card-body text-center p-4">
-                <i class="fas fa-chalkboard-teacher fa-3x mb-3 opacity-50"></i>
-                <h3 class="display-4 font-weight-bold">{{ total_mentors }}</h3>
-                <p class="mb-0 text-white-50">Verified Mentors</p>
-            </div>
+
+    <!-- Active Jobs -->
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-label">Active Jobs</span>
+            <i class="fas fa-briefcase stat-icon icon-pink"></i>
+        </div>
+        <div class="stat-value">{{ stats.active_jobs }}</div>
+        <div class="stat-growth">
+            <i class="fas fa-arrow-up"></i> 8% this month
         </div>
     </div>
-    <!-- Pending Requests -->
-    <div class="col-md-4">
-        <div class="card shadow-sm border-0 h-100"
-            style="background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%); color: white;">
-            <div class="card-body text-center p-4">
-                <i class="fas fa-hourglass-half fa-3x mb-3 opacity-50"></i>
-                <h3 class="display-4 font-weight-bold">{{ pending_mentors }}</h3>
-                <p class="mb-0 text-white-50">Pending Verifications</p>
-            </div>
+
+    <!-- Course Enrollments -->
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-label">Course Enrollments</span>
+            <i class="fas fa-graduation-cap stat-icon icon-blue"></i>
+        </div>
+        <div class="stat-value">{{ stats.course_enrollments }}</div>
+        <div class="stat-growth">
+            <i class="fas fa-arrow-up"></i> 15% this month
+        </div>
+    </div>
+
+    <!-- Mentor Matches -->
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-label">Mentor Matches</span>
+            <i class="fas fa-handshake stat-icon icon-teal"></i>
+        </div>
+        <div class="stat-value">{{ stats.mentor_matches }}</div>
+        <div class="stat-growth">
+            <i class="fas fa-arrow-up"></i> 22% this month
         </div>
     </div>
 </div>
 
-<div class="row">
-    <!-- User Management Table -->
-    <div class="col-lg-8 mb-4">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 font-weight-bold text-primary">Recent Users</h5>
-                <span class="badge badge-light text-muted">Last 50</span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>User</th>
-                            <th>Role</th>
-                            <th>Date Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if users %}
-                        {% for user in users %}
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    {% if user.profile_picture %}
-                                    <img src="{{ url_for('static', filename=user.profile_picture) }}"
-                                        class="rounded-circle mr-3"
-                                        style="width: 40px; height: 40px; object-fit: cover;">
-                                    {% else %}
-                                    <div class="rounded-circle mr-3 d-flex align-items-center justify-content-center bg-light text-primary font-weight-bold"
-                                        style="width: 40px; height: 40px;">
-                                        {{ user.first_name[0] }}{{ user.last_name[0] }}
-                                    </div>
-                                    {% endif %}
-                                    <div>
-                                        <div class="font-weight-bold text-dark">{{ user.first_name }} {{ user.last_name
-                                            }}</div>
-                                        <small class="text-muted">{{ user.email }}</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                {% if user.role == 'admin' %}
-                                <span class="badge badge-danger">Admin</span>
-                                {% elif user.role == 'mentor' %}
-                                <span class="badge badge-success">Mentor</span>
-                                {% else %}
-                                <span class="badge badge-secondary">User</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                {% if user.role != 'admin' %}
-                                <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="POST"
-                                    onsubmit="return confirm('Are you sure you want to delete this user completely?');"
-                                    style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete User">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">No users found.</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
+<!-- Charts Section -->
+<div class="charts-grid">
+    <!-- User Growth Chart -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">User Growth</h3>
+            <select class="chart-select">
+                <option>Last 30 days</option>
+                <option>Last 6 months</option>
+            </select>
         </div>
+        <canvas id="userGrowthChart"></canvas>
     </div>
 
-    <!-- Pending Verifications -->
-    <div class="col-lg-4 mb-4">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 font-weight-bold text-warning">Pending Mentors</h5>
-            </div>
-            <div class="list-group list-group-flush">
-                {% if pending_verification %}
-                {% for mentor in pending_verification %}
-                <div class="list-group-item p-3">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle mr-3 d-flex align-items-center justify-content-center bg-warning text-white font-weight-bold"
-                            style="width: 40px; height: 40px;">
-                            {{ mentor.first_name[0] }}
-                        </div>
-                        <div>
-                            <h6 class="mb-0">{{ mentor.first_name }} {{ mentor.last_name }}</h6>
-                            <small class="text-muted">{{ mentor.company }} &bull; {{ mentor.job_title }}</small>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <form action="{{ url_for('admin.approve_mentor', user_id=mentor.id) }}" method="POST"
-                            class="mr-2 w-100">
-                            <button type="submit" class="btn btn-sm btn-success btn-block">Approve</button>
-                        </form>
-                        <form action="{{ url_for('admin.reject_mentor', user_id=mentor.id) }}" method="POST"
-                            class="w-100">
-                            <button type="submit" class="btn btn-sm btn-outline-danger btn-block">Reject</button>
-                        </form>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-check-circle fa-2x mb-3 text-success opacity-50"></i>
-                    <p class="mb-0">All caught up!</p>
-                    <small>No pending verifications.</small>
-                </div>
-                {% endif %}
-            </div>
+    <!-- Platform Activity -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">Platform Activity</h3>
+            <select class="chart-select">
+                <option>Last 30 days</option>
+            </select>
         </div>
+        <canvas id="activityChart"></canvas>
     </div>
 </div>
+
+<script>
+    // User Growth Chart
+    const ctxGrowth = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(ctxGrowth, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'New Users',
+                data: [120, 190, 300, 500, 700, 900],
+                borderColor: '#9b51e0',
+                backgroundColor: 'rgba(155, 81, 224, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Activity Chart
+    const ctxActivity = document.getElementById('activityChart').getContext('2d');
+    new Chart(ctxActivity, {
+        type: 'bar',
+        data: {
+            labels: ['Course Enroll', 'Job Apps', 'Matches', 'Comm. Posts'],
+            datasets: [{
+                label: 'Activity',
+                data: [
+                    {{ stats.course_enrollments }},
+            {{ stats.job_applications }}, 
+                    {{ stats.mentor_matches }},
+        {{ stats.community_posts }}
+                ],
+        backgroundColor: [
+        '#9b51e0',
+        '#e91e63',
+        '#00bcd4',
+        '#00ca72'
+    ]
+            }]
+        },
+        options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+    });
+</script>
 {% endblock %}
