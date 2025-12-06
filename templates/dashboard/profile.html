@@ -21,19 +21,19 @@
             <div class="profile-overview">
                 <div class="profile-avatar-section">
                     <div class="avatar-container">
-                        <img src="{{ current_user.profile_picture or url_for('static', filename='images/avatar-placeholder.png') }}" 
-                             alt="Profile" class="profile-avatar" id="profileAvatar">
+                        <img src="{{ url_for('static', filename=current_user.profile_picture) if current_user.profile_picture else url_for('static', filename='images/avatar-placeholder.png') }}"
+                            alt="Profile" class="profile-avatar" id="profileAvatar">
                         <button class="avatar-upload" id="uploadAvatar">
                             <i class="fas fa-camera"></i>
                         </button>
                     </div>
                     <input type="file" id="avatarInput" accept="image/*" style="display: none;">
                 </div>
-                
+
                 <div class="profile-info">
                     <h3>{{ current_user.first_name }} {{ current_user.last_name }}</h3>
                     <p class="profile-email">{{ current_user.email }}</p>
-                    
+
                     <div class="profile-stats">
                         <div class="profile-stat">
                             <span class="stat-value">{{ enrolled_courses }}</span>
@@ -67,92 +67,75 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="firstName" class="form-label">First Name</label>
-                        <input type="text" 
-                               id="firstName" 
-                               class="form-control" 
-                               value="{{ current_user.first_name }}"
-                               required>
+                        <input type="text" id="firstName" class="form-control" value="{{ current_user.first_name }}"
+                            required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="lastName" class="form-label">Last Name</label>
-                        <input type="text" 
-                               id="lastName" 
-                               class="form-control" 
-                               value="{{ current_user.last_name }}"
-                               required>
+                        <input type="text" id="lastName" class="form-control" value="{{ current_user.last_name }}"
+                            required>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="email" class="form-label">Email Address</label>
-                        <input type="email" 
-                               id="email" 
-                               class="form-control" 
-                               value="{{ current_user.email }}"
-                               required disabled>
+                        <input type="email" id="email" class="form-control" value="{{ current_user.email }}" required
+                            disabled>
                         <small class="form-text">Contact support to change your email</small>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="phone" class="form-label">Phone Number</label>
-                        <input type="tel" 
-                               id="phone" 
-                               class="form-control" 
-                               value="{{ current_user.phone or '' }}"
-                               placeholder="+1 (555) 123-4567">
+                        <input type="tel" id="phone" class="form-control" value="{{ current_user.phone or '' }}"
+                            placeholder="+1 (555) 123-4567">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="location" class="form-label">Location</label>
-                    <input type="text" 
-                           id="location" 
-                           class="form-control" 
-                           value="{{ current_user.location or '' }}"
-                           placeholder="City, State, Country">
+                    <input type="text" id="location" class="form-control" value="{{ current_user.location or '' }}"
+                        placeholder="City, State, Country">
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="previousRole" class="form-label">Previous Role</label>
-                        <input type="text" 
-                               id="previousRole" 
-                               class="form-control" 
-                               value="{{ current_user.previous_role or '' }}"
-                               placeholder="e.g., Software Engineer, Marketing Manager">
+                        <input type="text" id="previousRole" class="form-control"
+                            value="{{ current_user.previous_role or '' }}"
+                            placeholder="e.g., Software Engineer, Marketing Manager">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="desiredRole" class="form-label">Desired Role</label>
-                        <input type="text" 
-                               id="desiredRole" 
-                               class="form-control" 
-                               value="{{ current_user.desired_role or '' }}"
-                               placeholder="What role are you seeking?">
+                        <input type="text" id="desiredRole" class="form-control"
+                            value="{{ current_user.desired_role or '' }}" placeholder="What role are you seeking?">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="careerBreak" class="form-label">Career Break Duration</label>
                     <select id="careerBreak" class="form-control">
                         <option value="">Select duration</option>
-                        <option value="1" {% if current_user.career_break_years == 1 %}selected{% endif %}>1 year or less</option>
-                        <option value="2" {% if current_user.career_break_years == 2 %}selected{% endif %}>2 years</option>
-                        <option value="3" {% if current_user.career_break_years == 3 %}selected{% endif %}>3 years</option>
-                        <option value="4" {% if current_user.career_break_years == 4 %}selected{% endif %}>4 years</option>
-                        <option value="5" {% if current_user.career_break_years == 5 %}selected{% endif %}>5+ years</option>
+                        <option value="1" {% if current_user.career_break_years==1 %}selected{% endif %}>1 year or less
+                        </option>
+                        <option value="2" {% if current_user.career_break_years==2 %}selected{% endif %}>2 years
+                        </option>
+                        <option value="3" {% if current_user.career_break_years==3 %}selected{% endif %}>3 years
+                        </option>
+                        <option value="4" {% if current_user.career_break_years==4 %}selected{% endif %}>4 years
+                        </option>
+                        <option value="5" {% if current_user.career_break_years==5 %}selected{% endif %}>5+ years
+                        </option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="skills" class="form-label">Skills</label>
                     <div class="skills-input-container">
-                        <input type="text" 
-                               id="skillsInput" 
-                               class="form-control" 
-                               placeholder="Add skills (e.g., Python, Project Management)">
+                        <input type="text" id="skillsInput" class="form-control"
+                            placeholder="Add skills (e.g., Python, Project Management)">
                         <button type="button" class="btn btn-outline" id="addSkill">Add</button>
                     </div>
                     <div class="skills-tags" id="skillsTags">
@@ -168,15 +151,13 @@
                     </div>
                     <small class="form-text">Add at least 5 skills for better job matching</small>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="bio" class="form-label">Professional Bio</label>
-                    <textarea id="bio" 
-                              class="form-control" 
-                              rows="4"
-                              placeholder="Tell us about your professional background, achievements, and career goals...">{{ current_user.bio or '' }}</textarea>
+                    <textarea id="bio" class="form-control" rows="4"
+                        placeholder="Tell us about your professional background, achievements, and career goals...">{{ current_user.bio or '' }}</textarea>
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Save Changes
@@ -239,7 +220,7 @@
                     </div>
                     <button class="btn btn-outline btn-sm">Change</button>
                 </div>
-                
+
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Email Notifications</h4>
@@ -250,7 +231,7 @@
                         <label for="emailNotifications" class="toggle-slider"></label>
                     </div>
                 </div>
-                
+
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Profile Visibility</h4>
@@ -262,7 +243,7 @@
                         <option>Private</option>
                     </select>
                 </div>
-                
+
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Download Data</h4>
@@ -270,7 +251,7 @@
                     </div>
                     <button class="btn btn-outline btn-sm">Request</button>
                 </div>
-                
+
                 <div class="setting-item danger">
                     <div class="setting-info">
                         <h4>Delete Account</h4>
@@ -286,384 +267,398 @@
 
 {% block extra_css %}
 <style>
-.profile-header {
-    margin-bottom: 2rem;
-}
+    .profile-header {
+        margin-bottom: 2rem;
+    }
 
-.completion-badge {
-    padding: 0.25rem 0.75rem;
-    background: var(--success-color);
-    color: white;
-    border-radius: 50px;
-    font-size: 0.875rem;
-    font-weight: 600;
-}
+    .completion-badge {
+        padding: 0.25rem 0.75rem;
+        background: var(--success-color);
+        color: white;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
 
-.profile-overview {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 2rem;
-    align-items: center;
-}
-
-.avatar-container {
-    position: relative;
-    width: 120px;
-    height: 120px;
-}
-
-.profile-avatar {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid var(--primary-light);
-}
-
-.avatar-upload {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 36px;
-    height: 36px;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.profile-info h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-    color: var(--dark-color);
-}
-
-.profile-email {
-    color: var(--gray);
-    margin-bottom: 1.5rem;
-}
-
-.profile-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-}
-
-.profile-stat {
-    text-align: center;
-}
-
-.stat-value {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.stat-label {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--gray);
-}
-
-.profile-form {
-    max-width: 800px;
-}
-
-.skills-input-container {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.skills-input-container input {
-    flex: 1;
-}
-
-.skills-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-}
-
-.skill-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.75rem;
-    background: rgba(138, 43, 226, 0.1);
-    color: var(--primary-color);
-    border-radius: 50px;
-    font-size: 0.875rem;
-}
-
-.remove-skill {
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    font-size: 1rem;
-    line-height: 1;
-    padding: 0;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.completion-progress {
-    max-width: 600px;
-}
-
-.progress-steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-}
-
-.progress-step {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.progress-step i {
-    font-size: 1.25rem;
-}
-
-.progress-step.completed i {
-    color: var(--success-color);
-}
-
-.progress-step.active i {
-    color: var(--primary-color);
-}
-
-.progress-step:not(.completed):not(.active) i {
-    color: var(--gray-light);
-}
-
-.settings-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.setting-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--gray-light);
-}
-
-.setting-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.setting-item.danger .setting-info h4 {
-    color: var(--danger-color);
-}
-
-.setting-info h4 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-    color: var(--dark-color);
-}
-
-.setting-info p {
-    color: var(--gray);
-    font-size: 0.875rem;
-}
-
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-}
-
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--gray-light);
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .toggle-slider {
-    background-color: var(--primary-color);
-}
-
-input:checked + .toggle-slider:before {
-    transform: translateX(26px);
-}
-
-@media (max-width: 768px) {
     .profile-overview {
-        grid-template-columns: 1fr;
-        text-align: center;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 2rem;
+        align-items: center;
     }
-    
+
+    .avatar-container {
+        position: relative;
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile-avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--primary-light);
+    }
+
+    .avatar-upload {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 36px;
+        height: 36px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-info h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+        color: var(--dark-color);
+    }
+
+    .profile-email {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+    }
+
     .profile-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .progress-steps {
-        grid-template-columns: 1fr;
-    }
-    
-    .setting-item {
-        flex-direction: column;
-        align-items: flex-start;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
         gap: 1rem;
     }
-}
+
+    .profile-stat {
+        text-align: center;
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .stat-label {
+        display: block;
+        font-size: 0.875rem;
+        color: var(--gray);
+    }
+
+    .profile-form {
+        max-width: 800px;
+    }
+
+    .skills-input-container {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .skills-input-container input {
+        flex: 1;
+    }
+
+    .skills-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .skill-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background: rgba(138, 43, 226, 0.1);
+        color: var(--primary-color);
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+
+    .remove-skill {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        padding: 0;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .completion-progress {
+        max-width: 600px;
+    }
+
+    .progress-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .progress-step {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .progress-step i {
+        font-size: 1.25rem;
+    }
+
+    .progress-step.completed i {
+        color: var(--success-color);
+    }
+
+    .progress-step.active i {
+        color: var(--primary-color);
+    }
+
+    .progress-step:not(.completed):not(.active) i {
+        color: var(--gray-light);
+    }
+
+    .settings-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-light);
+    }
+
+    .setting-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .setting-item.danger .setting-info h4 {
+        color: var(--danger-color);
+    }
+
+    .setting-info h4 {
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        color: var(--dark-color);
+    }
+
+    .setting-info p {
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--gray-light);
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.toggle-slider {
+        background-color: var(--primary-color);
+    }
+
+    input:checked+.toggle-slider:before {
+        transform: translateX(26px);
+    }
+
+    @media (max-width: 768px) {
+        .profile-overview {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .profile-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .progress-steps {
+            grid-template-columns: 1fr;
+        }
+
+        .setting-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Avatar upload
-    const uploadBtn = document.getElementById('uploadAvatar');
-    const avatarInput = document.getElementById('avatarInput');
-    const profileAvatar = document.getElementById('profileAvatar');
-    
-    uploadBtn.addEventListener('click', () => {
-        avatarInput.click();
-    });
-    
-    avatarInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                profileAvatar.src = e.target.result;
-                // Here you would upload to server
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    // Skills management
-    const skillsInput = document.getElementById('skillsInput');
-    const addSkillBtn = document.getElementById('addSkill');
-    const skillsTags = document.getElementById('skillsTags');
-    
-    addSkillBtn.addEventListener('click', function() {
-        const skill = skillsInput.value.trim();
-        if (skill) {
-            const tag = document.createElement('span');
-            tag.className = 'skill-tag';
-            tag.innerHTML = `${skill} <button type="button" class="remove-skill">&times;</button>`;
-            skillsTags.appendChild(tag);
-            skillsInput.value = '';
-            
-            // Add remove functionality
-            tag.querySelector('.remove-skill').addEventListener('click', function() {
-                tag.remove();
-            });
-        }
-    });
-    
-    skillsInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addSkillBtn.click();
-        }
-    });
-    
-    // Existing remove skill buttons
-    document.querySelectorAll('.remove-skill').forEach(button => {
-        button.addEventListener('click', function() {
-            this.parentElement.remove();
+    document.addEventListener('DOMContentLoaded', function () {
+        // Avatar upload
+        const uploadBtn = document.getElementById('uploadAvatar');
+        const avatarInput = document.getElementById('avatarInput');
+        const profileAvatar = document.getElementById('profileAvatar');
+
+        uploadBtn.addEventListener('click', () => {
+            avatarInput.click();
         });
-    });
-    
-    // Form submission
-    const profileForm = document.getElementById('profileForm');
-    profileForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Collect form data
-        const formData = {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            phone: document.getElementById('phone').value,
-            location: document.getElementById('location').value,
-            previousRole: document.getElementById('previousRole').value,
-            desiredRole: document.getElementById('desiredRole').value,
-            careerBreak: document.getElementById('careerBreak').value,
-            skills: Array.from(skillsTags.querySelectorAll('.skill-tag'))
-                        .map(tag => tag.firstChild.textContent.trim()),
-            bio: document.getElementById('bio').value
-        };
-        
-        // Simulate API call
-        fetch('/dashboard/update-profile', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('Profile updated successfully!', 'success');
-            } else {
-                showNotification('Failed to update profile', 'error');
+
+        avatarInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    profileAvatar.src = e.target.result;
+                    // Here you would upload to server
+                };
+                reader.readAsDataURL(file);
             }
         });
-    });
-    
-    // Cancel button
-    document.getElementById('cancelChanges').addEventListener('click', function() {
-        window.location.reload();
-    });
-    
-    // Toggle switches
-    document.getElementById('emailNotifications').addEventListener('change', function() {
-        // Handle notification preference change
-    });
-    
-    function showNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.textContent = message;
-        notification.style.cssText = `
+
+        // Skills management
+        const skillsInput = document.getElementById('skillsInput');
+        const addSkillBtn = document.getElementById('addSkill');
+        const skillsTags = document.getElementById('skillsTags');
+
+        addSkillBtn.addEventListener('click', function () {
+            const skill = skillsInput.value.trim();
+            if (skill) {
+                const tag = document.createElement('span');
+                tag.className = 'skill-tag';
+                tag.innerHTML = `${skill} <button type="button" class="remove-skill">&times;</button>`;
+                skillsTags.appendChild(tag);
+                skillsInput.value = '';
+
+                // Add remove functionality
+                tag.querySelector('.remove-skill').addEventListener('click', function () {
+                    tag.remove();
+                });
+            }
+        });
+
+        skillsInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addSkillBtn.click();
+            }
+        });
+
+        // Existing remove skill buttons
+        document.querySelectorAll('.remove-skill').forEach(button => {
+            button.addEventListener('click', function () {
+                this.parentElement.remove();
+            });
+        });
+
+        // Form submission
+        const profileForm = document.getElementById('profileForm');
+        profileForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Create FormData object (handles file uploads automatically)
+            const formData = new FormData();
+
+            // Add text fields
+            formData.append('firstName', document.getElementById('firstName').value);
+            formData.append('lastName', document.getElementById('lastName').value);
+            formData.append('phone', document.getElementById('phone').value);
+            formData.append('location', document.getElementById('location').value);
+            formData.append('previousRole', document.getElementById('previousRole').value);
+            formData.append('desiredRole', document.getElementById('desiredRole').value);
+            formData.append('careerBreak', document.getElementById('careerBreak').value);
+            formData.append('bio', document.getElementById('bio').value);
+
+            // Add skills list
+            const skillsList = Array.from(skillsTags.querySelectorAll('.skill-tag'))
+                .map(tag => tag.firstChild.textContent.trim());
+            formData.append('skills', skillsList.join(',')); // Send as CSV string
+
+            // Add profile picture if selected
+            const fileInput = document.getElementById('avatarInput');
+            if (fileInput.files.length > 0) {
+                formData.append('profilePicture', fileInput.files[0]);
+            }
+
+            // Send data
+            fetch('/dashboard/update-profile', {
+                method: 'POST',
+                body: formData
+                // Note: Content-Type header is not set manually so browser sets multipart/form-data boundary
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Profile updated successfully!', 'success');
+                        // Optional: reload to show new image from server URL if needed
+                        if (fileInput.files.length > 0) setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification('Failed to update profile: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred. Please try again.', 'error');
+                });
+        });
+
+        // Cancel button
+        document.getElementById('cancelChanges').addEventListener('click', function () {
+            window.location.reload();
+        });
+
+        // Toggle switches
+        document.getElementById('emailNotifications').addEventListener('change', function () {
+            // Handle notification preference change
+        });
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
@@ -674,13 +669,13 @@ document.addEventListener('DOMContentLoaded', function() {
             z-index: 10000;
             animation: slideIn 0.3s ease;
         `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
-});
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    });
 </script>
 {% endblock %}

@@ -142,11 +142,36 @@
     <div class="modal-content quiz-modal-content">
         <div class="modal-header">
             <h3><i class="fas fa-brain"></i> AI Skill Quiz</h3>
-            <button class="close-modal" onclick="closeQuizModal()">&times;</button>
+            <div style="margin-left: auto; display: flex; gap: 10px;">
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleHistory()">
+                    <i class="fas fa-history"></i> History
+                </button>
+                <button class="close-modal" onclick="closeQuizModal()"
+                    style="font-size: 1.5rem; background: none; border: none; cursor: pointer;">&times;</button>
+            </div>
         </div>
         <div class="modal-body">
+            <!-- Step 1: Domain Selection -->
+            <div id="quiz-setup" class="text-center">
+                <h4>Select Assessment Domain</h4>
+                <p>Choose a topic to generate your personalized quiz.</p>
+                <div class="form-group" style="max-width: 300px; margin: 1.5rem auto;">
+                    <select id="assessment-domain" class="form-control">
+                        <option value="Python">Python</option>
+                        <option value="Web Development">Web Development</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Machine Learning">Machine Learning</option>
+                        <option value="Cloud Computing">Cloud Computing</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
+                        <option value="DevOps">DevOps</option>
+                        <option value="Project Management">Project Management</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="initiateQuizGeneration()">Start Assessment</button>
+            </div>
+
             <!-- Loading State -->
-            <div id="quiz-loading" class="text-center py-5">
+            <div id="quiz-loading" class="text-center py-5" style="display: none;">
                 <div class="spinner"></div>
                 <p>Generating your personalized quiz...</p>
             </div>
@@ -179,6 +204,17 @@
                 <p id="result-message">Great job! You've shown strong skills.</p>
                 <button class="btn btn-primary mt-3" onclick="closeQuizModal(); loadRecommendedCourses();">
                     View Recommended Courses
+                </button>
+            </div>
+
+            <!-- History View -->
+            <div id="quiz-history" style="display: none; padding: 1rem;">
+                <h4 class="mb-4">Assessment History</h4>
+                <div id="history-list" class="list-group">
+                    <!-- Dynamic history items -->
+                </div>
+                <button class="btn btn-secondary mt-3" onclick="toggleHistory()">
+                    Back to Quiz
                 </button>
             </div>
         </div>
@@ -821,45 +857,76 @@
 
     function startAIQuiz(type = 'technical') {
         const modal = document.getElementById('quizModal');
-        const loading = document.getElementById('quiz-loading');
-        const container = document.getElementById('quiz-container');
-        const results = document.getElementById('quiz-results');
-
         if (!modal) return;
 
         modal.style.display = 'flex';
-        loading.style.display = 'block';
-        container.style.display = 'none';
-        results.style.display = 'none';
+
+        // Reset UI triggers
+        document.getElementById('quiz-setup').style.display = 'block';
+        document.getElementById('quiz-loading').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('quiz-results').style.display = 'none';
 
         // Reset state
         currentQuestionIndex = 0;
         userScore = 0;
         quizQuestions = [];
+    }
+
+    function initiateQuizGeneration() {
+        const domainSelect = document.getElementById('assessment-domain');
+        const domain = domainSelect ? domainSelect.value : 'technical';
+
+        document.getElementById('quiz-setup').style.display = 'none';
+        document.getElementById('quiz-loading').style.display = 'block';
+
+        // Set a timeout to prevent infinite loading state
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds timeout
 
         // Fetch Quiz
         fetch('/dashboard/api/generate-quiz', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: type })
+            body: JSON.stringify({
+                type: 'technical',
+                domain: domain
+            }),
+            signal: controller.signal
         })
-            .then(res => res.json())
+            .then(async res => {
+                clearTimeout(timeoutId);
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || `Server returned ${res.status}`);
+                }
+                return data;
+            })
             .then(data => {
                 if (data.success && data.quiz.questions) {
                     quizQuestions = data.quiz.questions;
-                    loading.style.display = 'none';
-                    container.style.display = 'block';
-                    renderQuestion();
+                    startQuiz(quizQuestions);
                 } else {
-                    alert('Failed to generate quiz. Please try again.');
+                    alert('Failed to generate quiz: ' + (data.error || 'Unknown error'));
                     closeQuizModal();
                 }
             })
             .catch(err => {
+                clearTimeout(timeoutId);
                 console.error(err);
-                alert('Error connecting to AI service.');
+                if (err.name === 'AbortError') {
+                    alert('Request timed out. Please try again.');
+                } else {
+                    alert('Error connecting to AI service: ' + err.message);
+                }
                 closeQuizModal();
             });
+    }
+
+    function startQuiz(questions) {
+        document.getElementById('quiz-loading').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        renderQuestion();
     }
 
     function closeQuizModal() {
@@ -868,6 +935,8 @@
     }
 
     function renderQuestion() {
+        if (!quizQuestions || quizQuestions.length === 0) return;
+
         const question = quizQuestions[currentQuestionIndex];
         const topicEl = document.getElementById('question-topic');
         const textEl = document.getElementById('question-text');
@@ -932,19 +1001,58 @@
         document.getElementById('quiz-results').style.display = 'block';
         document.getElementById('final-score').textContent = userScore;
 
+        const totalEl = document.querySelector('.total');
+        if (totalEl) totalEl.textContent = `/${quizQuestions.length}`;
+
         const percentage = (userScore / quizQuestions.length) * 100;
         let msg = "Keep learning! You're getting there.";
-        if (percentage >= 80) msg = "Excellent Work! You've mastered these skills.";
-        else if (percentage >= 60) msg = "Good job! A bit more practice will help.";
+        if (percentage >= 80) msg = "Excellent Work! You've mastered these skills. Showing Advanced Courses.";
+        else if (percentage >= 50) msg = "Good start! Showing Advanced Courses to challenge you.";
+        else msg = "Good effort! We've recommended some Beginner courses to build your foundation.";
 
         document.getElementById('result-message').textContent = msg;
+
+        // Submit results and fetch adaptive courses
+        submitQuiz();
     }
 
     // Course Recommendation Logic
     let currentCourses = [];
     let sortMode = 'rating'; // 'rating' or 'price'
 
-    async function loadRecommendedCourses(skillGaps = []) {
+    // Submit Quiz logic
+    function submitQuiz() {
+        const domainSelect = document.getElementById('assessment-domain');
+        const domain = domainSelect ? domainSelect.value : 'technical';
+
+        // Collect answers if needed, for now just score
+        const submission = {
+            domain: domain,
+            score: userScore,
+            total: quizQuestions.length,
+            answers: [] // Can be populated if we tracked user choices
+        };
+
+        fetch('/dashboard/api/submit-quiz', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(submission)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Quiz saved:', data.message);
+                    // Trigger adaptive learning fetch
+                    const proficiency = (userScore / quizQuestions.length) >= 0.5 ? 'Advanced' : 'Beginner';
+                    loadRecommendedCourses(proficiency, domain);
+                } else {
+                    console.error('Failed to save quiz:', data.error);
+                }
+            })
+            .catch(err => console.error('Error submitting quiz:', err));
+    }
+
+    async function loadRecommendedCourses(level = 'Intermediate', domain = null) {
         const grid = document.getElementById('courses-grid');
         const loading = document.getElementById('courses-loading');
         const gapsSpan = document.getElementById('current-skill-gaps');
@@ -955,14 +1063,16 @@
         if (loading) loading.style.display = 'block';
 
         try {
+            const body = {};
+            if (level) body.level = level;
+            if (domain) body.skill_gaps = [domain]; // Use domain as skill gap if provided
+
             const response = await fetch('/dashboard/api/recommend-courses', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    skill_gaps: skillGaps
-                })
+                body: JSON.stringify(body)
             });
 
             const data = await response.json();
@@ -970,11 +1080,7 @@
             if (data.success) {
                 currentCourses = data.courses;
                 if (gapsSpan) {
-                    if (skillGaps.length > 0) {
-                        gapsSpan.textContent = skillGaps.join(', ');
-                    } else {
-                        gapsSpan.textContent = "General Improvement";
-                    }
+                    gapsSpan.textContent = (domain ? domain : "Your Skills") + ` (${level} Level)`;
                 }
                 renderCourses();
             } else {
@@ -1074,6 +1180,52 @@
             else stars += '<i class="far fa-star"></i>';
         }
         return stars;
+    }
+
+    // History Logic
+    function toggleHistory() {
+        const historyView = document.getElementById('quiz-history');
+        const setupView = document.getElementById('quiz-setup');
+
+        if (historyView.style.display === 'none') {
+            // Show history
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('quiz-results').style.display = 'none';
+            setupView.style.display = 'none';
+            historyView.style.display = 'block';
+            fetchHistory();
+        } else {
+            // Hide history
+            historyView.style.display = 'none';
+            setupView.style.display = 'block';
+        }
+    }
+
+    function fetchHistory() {
+        const list = document.getElementById('history-list');
+        list.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+
+        fetch('/dashboard/api/assessment-history')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.history.length > 0) {
+                    list.innerHTML = data.history.map(item => `
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${item.type}</h6>
+                                <small class="text-muted">${new Date(item.date).toLocaleDateString()}</small>
+                            </div>
+                            <span class="badge badge-primary badge-pill">${item.score}%</span>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<p class="text-center text-muted">No past assessments found.</p>';
+                }
+            })
+            .catch(err => {
+                list.innerHTML = '<p class="text-danger text-center">Failed to load history.</p>';
+                console.error(err);
+            });
     }
 
     // Auto-load on page load

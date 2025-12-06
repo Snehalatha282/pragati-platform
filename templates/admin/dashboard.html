@@ -1,656 +1,168 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-
-{% block title %}Admin Dashboard - Pragati{% endblock %}
+{% block title %}Admin Dashboard &mdash; Pragati{% endblock %}
 
 {% block content %}
-<div class="admin-dashboard">
-    <!-- Admin Sidebar -->
-    <aside class="admin-sidebar">
-        <div class="admin-header">
-            <div class="admin-logo">
-                <i class="fas fa-venus"></i>
-                <span>Pragati Admin</span>
-            </div>
-            <div class="admin-user">
-                <img src="{{ current_user.profile_picture or url_for('static', filename='images/avatar-placeholder.png') }}" 
-                     alt="Admin" class="admin-avatar">
-                <div class="admin-info">
-                    <h4>{{ current_user.first_name }}</h4>
-                    <p>Administrator</p>
-                </div>
-            </div>
-        </div>
-        
-        <nav class="admin-nav">
-            <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link active">
-                <i class="fas fa-chart-bar"></i> Dashboard
-            </a>
-            <a href="{{ url_for('admin.users') }}" class="admin-nav-link">
-                <i class="fas fa-users"></i> Users
-            </a>
-            <a href="{{ url_for('admin.jobs') }}" class="admin-nav-link">
-                <i class="fas fa-briefcase"></i> Job Listings
-            </a>
-            <a href="{{ url_for('admin.courses') }}" class="admin-nav-link">
-                <i class="fas fa-graduation-cap"></i> Courses
-            </a>
-            <a href="{{ url_for('admin.mentors') }}" class="admin-nav-link">
-                <i class="fas fa-hands-helping"></i> Mentors
-            </a>
-            <a href="{{ url_for('admin.community') }}" class="admin-nav-link">
-                <i class="fas fa-comments"></i> Community
-            </a>
-            <a href="{{ url_for('admin.settings') }}" class="admin-nav-link">
-                <i class="fas fa-cog"></i> Settings
-            </a>
-        </nav>
-    </aside>
-    
-    <!-- Main Content -->
-    <main class="admin-content">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <h1>Admin Dashboard</h1>
-            <div class="header-actions">
-                <button class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add Content
-                </button>
-            </div>
-        </div>
-        
-        <!-- Stats Overview -->
-        <div class="stats-overview">
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3>Total Users</h3>
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-body">
-                    <div class="stat-value">2,548</div>
-                    <div class="stat-trend positive">
-                        <i class="fas fa-arrow-up"></i> 12% this month
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3>Active Jobs</h3>
-                    <i class="fas fa-briefcase"></i>
-                </div>
-                <div class="stat-body">
-                    <div class="stat-value">342</div>
-                    <div class="stat-trend positive">
-                        <i class="fas fa-arrow-up"></i> 8% this month
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3>Course Enrollments</h3>
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <div class="stat-body">
-                    <div class="stat-value">1,245</div>
-                    <div class="stat-trend positive">
-                        <i class="fas fa-arrow-up"></i> 15% this month
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3>Mentor Matches</h3>
-                    <i class="fas fa-hands-helping"></i>
-                </div>
-                <div class="stat-body">
-                    <div class="stat-value">876</div>
-                    <div class="stat-trend positive">
-                        <i class="fas fa-arrow-up"></i> 22% this month
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3>User Growth</h3>
-                    <select class="chart-period">
-                        <option>Last 7 days</option>
-                        <option selected>Last 30 days</option>
-                        <option>Last 90 days</option>
-                    </select>
-                </div>
-                <div class="chart-body">
-                    <canvas id="userGrowthChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3>Platform Activity</h3>
-                    <select class="chart-period">
-                        <option>Last 7 days</option>
-                        <option selected>Last 30 days</option>
-                        <option>Last 90 days</option>
-                    </select>
-                </div>
-                <div class="chart-body">
-                    <canvas id="activityChart"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Recent Activity -->
-        <div class="recent-activity">
-            <div class="activity-card">
-                <div class="card-header">
-                    <h3>Recent Activity</h3>
-                </div>
-                <div class="card-body">
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-icon success">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>New User Registration</h4>
-                                <p>Priya Sharma joined Pragati</p>
-                                <span class="activity-time">10 minutes ago</span>
-                            </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon info">
-                                <i class="fas fa-briefcase"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>Job Application</h4>
-                                <p>Anita Patel applied for Senior Developer role</p>
-                                <span class="activity-time">1 hour ago</span>
-                            </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon warning">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>Reported Content</h4>
-                                <p>A community post was flagged for review</p>
-                                <span class="activity-time">3 hours ago</span>
-                            </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon success">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>Course Completion</h4>
-                                <p>Meera Reddy completed Web Development course</p>
-                                <span class="activity-time">5 hours ago</span>
-                            </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon info">
-                                <i class="fas fa-hands-helping"></i>
-                            </div>
-                            <div class="activity-content">
-                                <h4>Mentor Match</h4>
-                                <p>New mentorship connection established</p>
-                                <span class="activity-time">1 day ago</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="quick-actions-card">
-                <div class="card-header">
-                    <h3>Quick Actions</h3>
-                </div>
-                <div class="card-body">
-                    <div class="actions-list">
-                        <button class="action-btn">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>Add New Course</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-edit"></i>
-                            <span>Update Job Listings</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-user-check"></i>
-                            <span>Verify Mentors</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>View Analytics</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-cog"></i>
-                            <span>System Settings</span>
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-download"></i>
-                            <span>Export Data</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+<div class="row mb-5">
+    <div class="col-12">
+        <h1 class="display-4 text-primary font-weight-bold">Admin Dashboard</h1>
+        <p class="lead text-muted">Platform Overview & Management</p>
+    </div>
 </div>
-{% endblock %}
 
-{% block extra_css %}
-<style>
-.admin-dashboard {
-    display: grid;
-    grid-template-columns: 250px 1fr;
-    min-height: 100vh;
-}
+<!-- Stats Row -->
+<div class="row mb-5">
+    <!-- Total Users -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100"
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-users fa-3x mb-3 opacity-50"></i>
+                <h3 class="display-4 font-weight-bold">{{ total_users }}</h3>
+                <p class="mb-0 text-white-50">Total Users</p>
+            </div>
+        </div>
+    </div>
+    <!-- Total Verified Mentors -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100"
+            style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-chalkboard-teacher fa-3x mb-3 opacity-50"></i>
+                <h3 class="display-4 font-weight-bold">{{ total_mentors }}</h3>
+                <p class="mb-0 text-white-50">Verified Mentors</p>
+            </div>
+        </div>
+    </div>
+    <!-- Pending Requests -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100"
+            style="background: linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%); color: white;">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-hourglass-half fa-3x mb-3 opacity-50"></i>
+                <h3 class="display-4 font-weight-bold">{{ pending_mentors }}</h3>
+                <p class="mb-0 text-white-50">Pending Verifications</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-.admin-sidebar {
-    background: var(--dark-color);
-    color: white;
-}
+<div class="row">
+    <!-- User Management Table -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 font-weight-bold text-primary">Recent Users</h5>
+                <span class="badge badge-light text-muted">Last 50</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Date Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if users %}
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if user.profile_picture %}
+                                    <img src="{{ url_for('static', filename=user.profile_picture) }}"
+                                        class="rounded-circle mr-3"
+                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="rounded-circle mr-3 d-flex align-items-center justify-content-center bg-light text-primary font-weight-bold"
+                                        style="width: 40px; height: 40px;">
+                                        {{ user.first_name[0] }}{{ user.last_name[0] }}
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="font-weight-bold text-dark">{{ user.first_name }} {{ user.last_name
+                                            }}</div>
+                                        <small class="text-muted">{{ user.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if user.role == 'admin' %}
+                                <span class="badge badge-danger">Admin</span>
+                                {% elif user.role == 'mentor' %}
+                                <span class="badge badge-success">Mentor</span>
+                                {% else %}
+                                <span class="badge badge-secondary">User</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if user.role != 'admin' %}
+                                <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this user completely?');"
+                                    style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete User">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No users found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-.admin-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.admin-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-}
-
-.admin-user {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.admin-avatar {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--primary-light);
-}
-
-.admin-info h4 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-}
-
-.admin-info p {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.admin-nav {
-    padding: 1rem 0;
-}
-
-.admin-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1.5rem;
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
-    transition: all 0.3s;
-}
-
-.admin-nav-link:hover,
-.admin-nav-link.active {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border-left: 3px solid var(--primary-color);
-}
-
-.admin-content {
-    padding: 2rem;
-    background: #f8fafc;
-}
-
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.dashboard-header h1 {
-    font-size: 1.75rem;
-    color: var(--dark-color);
-}
-
-.stats-overview {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 1.5rem;
-}
-
-.stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.stat-header h3 {
-    font-size: 1rem;
-    color: var(--gray);
-    font-weight: 500;
-}
-
-.stat-header i {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-}
-
-.stat-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--dark-color);
-}
-
-.stat-trend {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-}
-
-.stat-trend.positive {
-    color: var(--success-color);
-}
-
-.stat-trend.negative {
-    color: var(--danger-color);
-}
-
-.charts-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.chart-card {
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 1.5rem;
-}
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.chart-header h3 {
-    font-size: 1.125rem;
-    color: var(--dark-color);
-}
-
-.chart-period {
-    padding: 0.5rem;
-    border: 1px solid var(--gray-light);
-    border-radius: var(--radius);
-    background: white;
-}
-
-.chart-body {
-    height: 250px;
-}
-
-.recent-activity {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-}
-
-.activity-card,
-.quick-actions-card {
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
-.activity-card .card-header,
-.quick-actions-card .card-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--gray-light);
-}
-
-.activity-card .card-body,
-.quick-actions-card .card-body {
-    padding: 1.5rem;
-}
-
-.activity-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.activity-item {
-    display: flex;
-    gap: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--gray-light);
-}
-
-.activity-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.activity-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.activity-icon.success {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success-color);
-}
-
-.activity-icon.info {
-    background: rgba(6, 182, 212, 0.1);
-    color: var(--accent-color);
-}
-
-.activity-icon.warning {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning-color);
-}
-
-.activity-content h4 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-    color: var(--dark-color);
-}
-
-.activity-content p {
-    color: var(--gray);
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
-}
-
-.activity-time {
-    font-size: 0.75rem;
-    color: var(--gray);
-}
-
-.actions-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-}
-
-.action-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border: 1px solid var(--gray-light);
-    background: none;
-    border-radius: var(--radius);
-    color: var(--dark-color);
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.action-btn:hover {
-    background: var(--light-color);
-    border-color: var(--primary-color);
-}
-
-.action-btn i {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-}
-
-.action-btn span {
-    font-size: 0.875rem;
-    text-align: center;
-}
-
-@media (max-width: 1024px) {
-    .admin-dashboard {
-        grid-template-columns: 1fr;
-    }
-    
-    .admin-sidebar {
-        display: none;
-    }
-    
-    .charts-section {
-        grid-template-columns: 1fr;
-    }
-    
-    .recent-activity {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // User Growth Chart
-    const userCtx = document.getElementById('userGrowthChart').getContext('2d');
-    const userGrowthChart = new Chart(userCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{
-                label: 'New Users',
-                data: [120, 190, 300, 500, 700, 900],
-                borderColor: '#8a2be2',
-                backgroundColor: 'rgba(138, 43, 226, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-    
-    // Activity Chart
-    const activityCtx = document.getElementById('activityChart').getContext('2d');
-    const activityChart = new Chart(activityCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Course Enrollments', 'Job Applications', 'Mentor Matches', 'Community Posts'],
-            datasets: [{
-                label: 'Activities',
-                data: [1245, 876, 342, 567],
-                backgroundColor: [
-                    '#8a2be2',
-                    '#ec4899',
-                    '#06b6d4',
-                    '#10b981'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-    
-    // Chart period change
-    document.querySelectorAll('.chart-period').forEach(select => {
-        select.addEventListener('change', function() {
-            // In production, this would fetch new data based on period
-            console.log('Period changed to:', this.value);
-        });
-    });
-    
-    // Quick actions
-    document.querySelectorAll('.action-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const action = this.querySelector('span').textContent;
-            alert(`Action: ${action}\nThis would perform the selected action in production.`);
-        });
-    });
-});
-</script>
+    <!-- Pending Verifications -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 font-weight-bold text-warning">Pending Mentors</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                {% if pending_verification %}
+                {% for mentor in pending_verification %}
+                <div class="list-group-item p-3">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle mr-3 d-flex align-items-center justify-content-center bg-warning text-white font-weight-bold"
+                            style="width: 40px; height: 40px;">
+                            {{ mentor.first_name[0] }}
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{ mentor.first_name }} {{ mentor.last_name }}</h6>
+                            <small class="text-muted">{{ mentor.company }} &bull; {{ mentor.job_title }}</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form action="{{ url_for('admin.approve_mentor', user_id=mentor.id) }}" method="POST"
+                            class="mr-2 w-100">
+                            <button type="submit" class="btn btn-sm btn-success btn-block">Approve</button>
+                        </form>
+                        <form action="{{ url_for('admin.reject_mentor', user_id=mentor.id) }}" method="POST"
+                            class="w-100">
+                            <button type="submit" class="btn btn-sm btn-outline-danger btn-block">Reject</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-check-circle fa-2x mb-3 text-success opacity-50"></i>
+                    <p class="mb-0">All caught up!</p>
+                    <small>No pending verifications.</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,11 +1,16 @@
-# utils/gemini_assessment.py
 import os
 import json
 import google.generativeai as genai
 from typing import Dict, List, Any
 from dotenv import load_dotenv
+import logging
 
-load_dotenv()
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Force reload environment variables to ensure we get the latest key
+load_dotenv(override=True)
 
 class GeminiAssessment:
     def __init__(self):
@@ -14,10 +19,12 @@ class GeminiAssessment:
         
         if self.api_key:
             genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-pro')
+            # Use gemini-flash-latest as per available models
+            self.model = genai.GenerativeModel('gemini-flash-latest')
+            print(f"[Core] Gemini API Configured. Key starts with: {self.api_key[:10]}...", flush=True)
         else:
             self.model = None
-            print("Warning: GEMINI_API_KEY not found. Using mock mode.")
+            print("[Core] GEMINI_API_KEY not found. Using mock mode.", flush=True)
         
         # Assessment templates
         self.templates = {
@@ -82,7 +89,7 @@ Format as JSON: readiness_percentage, action_plan, interview_tips, salary_guidan
         """Run skill assessment using Gemini"""
         try:
             if not self.model:
-                 return self.mock_assessment(user_data)
+                 raise Exception("Gemini API not configured")
 
             # Prepare prompt
             template = self.templates.get(assessment_type, self.templates['technical'])
@@ -180,19 +187,19 @@ Format as JSON: readiness_percentage, action_plan, interview_tips, salary_guidan
             'is_mock': True
         }
 
-    def get_course_recommendations(self, skill_gaps: List[str]) -> List[Dict[str, Any]]:
-        """Generate course recommendations based on skill gaps"""
-        prompt = f"""Identify the top 5 online courses to learn these skills: {', '.join(skill_gaps)}.
+    def get_course_recommendations(self, skill_gaps: List[str], level: str = 'Intermediate') -> List[Dict[str, Any]]:
+        """Generate course recommendations based on skill gaps and level"""
+        prompt = f"""Identify the top 5 online courses for a '{level}' level learner to master these skills: {', '.join(skill_gaps)}.
         
         For each course, provide:
-        1. Course Title
+        1. Course Title (Must be real and high-quality)
         2. Platform (Coursera, Udemy, edX, etc.)
         3. Rating (0.0 to 5.0)
         4. Price (string, e.g., 'Free', '$19.99', '$49')
         5. Price Value (float, 0 for free, otherwise numeric price for sorting)
         6. URL (real or plausible search URL)
         
-        Consider both 'Top Rated' and 'Best Value' (Free/Low cost) options.
+        Consider both 'Top Rated' and 'Best Value' (Free/Low cost) options suitable for {level}s.
         
         Format as a JSON array of objects with keys: title, platform, rating, price, price_value, url.
         DO NOT include any markdown formatting or extra text, just the JSON array.
@@ -210,13 +217,18 @@ Format as JSON: readiness_percentage, action_plan, interview_tips, salary_guidan
             end_idx = content.rfind(']') + 1
             
             if start_idx != -1 and end_idx != 0:
-                return json.loads(content[start_idx:end_idx])
+                try:
+                    return json.loads(content[start_idx:end_idx])
+                except json.JSONDecodeError as e:
+                    print(f"[Core Error] JSON Decode Error in Recommendations. Raw content:\n{content[start_idx:end_idx]}", flush=True)
+                    raise e
             else:
-                return self._mock_course_recommendations(skill_gaps)
+                print(f"[Core Error] Could not find JSON array in response. Raw content:\n{content}", flush=True)
+                raise Exception("Failed to parse course recommendations")
                 
         except Exception as e:
-            print(f"Gemini API Error: {e}")
-            return self._mock_course_recommendations(skill_gaps)
+            print(f"[Core Error] Course Recommendation Error: {e}", flush=True)
+            raise e
 
     def _mock_course_recommendations(self, skill_gaps: List[str]) -> List[Dict[str, Any]]:
         """Mock data for course recommendations"""
@@ -268,7 +280,7 @@ Format as JSON: readiness_percentage, action_plan, interview_tips, salary_guidan
         prompt = f"""Create a technical quiz to assess these skills: {skills}.
         Difficulty Level: {difficulty}
         
-        Generate 5 Multiple Choice Questions.
+        Generate 10 to 15 Multiple Choice Questions.
         
         For each question provide:
         1. Question text
@@ -277,11 +289,19 @@ Format as JSON: readiness_percentage, action_plan, interview_tips, salary_guidan
         4. Explanation (why the answer is correct)
         5. Topic/Skill being tested
         
-        Format as a JSON object with a key 'questions' containing the array of question objects.
+        Format as a JSON object with a key 'questions' containing an array of objects.
+        Each object MUST have these exact keys:
+        - "question": (string) The question text
+        - "options": (array of 4 strings)
+        - "correct_answer": (integer) 0-3
+        - "explanation": (string)
+        - "topic": (string)
+        
         Do NOT include markdown formatting.
         """
         
         try:
+            print(f"[Core] Generating quiz for skills: {skills}", flush=True)
             response = self.model.generate_content(prompt)
             content = response.text
              
@@ -293,16 +313,24 @@ Format as JSON: readiness_percentage, action_plan, interview_tips, salary_guidan
             end_idx = content.rfind('}') + 1
             
             if start_idx != -1 and end_idx != 0:
-                return json.loads(content[start_idx:end_idx])
+                result = json.loads(content[start_idx:end_idx])
+                # Validate question count
+                if len(result.get('questions', [])) < 10:
+                    print(f"[Core Warning] Generated only {len(result.get('questions', []))} questions, expected 10-15.", flush=True)
+                else:
+                    print(f"[Core Success] AI Successfully generated {len(result.get('questions', []))} questions.", flush=True)
+                
+                return result
             else:
-                return self._mock_quiz(skills)
+                print(f"[Core Error] Failed to parse JSON. Raw output:\n{content}", flush=True)
+                raise Exception("Failed to parse AI response (Invalid JSON)")
                 
         except Exception as e:
-            print(f"Quiz Generation Error: {e}")
-            return self._mock_quiz(skills)
+            print(f"[Core Error] Quiz Generation Error: {e}", flush=True)
+            raise e
 
     def _mock_quiz(self, skills: str) -> Dict[str, Any]:
-        """Mock quiz data"""
+        """Mock quiz data with 10 questions"""
         return {
             "questions": [
                 {
@@ -344,6 +372,46 @@ Format as JSON: readiness_percentage, action_plan, interview_tips, salary_guidan
                     "correct_answer": 2,
                     "explanation": "CSS (Cascading Style Sheets) is used to describe the presentation of a document written in HTML.",
                     "topic": "CSS"
+                },
+                {
+                    "id": 6,
+                    "question": "What is the purpose of a primary key in a database?",
+                    "options": ["To encrypt data", "To uniquely identify each record", "To sort data alphabetically", "To store large files"],
+                    "correct_answer": 1,
+                    "explanation": "A primary key is a unique identifier for a database record, ensuring no duplicates exist.",
+                    "topic": "Database"
+                },
+                {
+                    "id": 7,
+                    "question": "Which HTTP method is typically used to retrieve data?",
+                    "options": ["POST", "PUT", "DELETE", "GET"],
+                    "correct_answer": 3,
+                    "explanation": "GET is the HTTP method designed to retrieve information from a server.",
+                    "topic": "API"
+                },
+                {
+                    "id": 8,
+                    "question": "What is 'hoisting' in JavaScript?",
+                    "options": ["Lifting weights", "Moving declarations to the top", "Deleting variables", "Hiding functions"],
+                    "correct_answer": 1,
+                    "explanation": "Hoisting is JavaScript's default behavior of moving declarations to the top of the current scope.",
+                    "topic": "JavaScript"
+                },
+                {
+                    "id": 9,
+                    "question": "What does SQL stand for?",
+                    "options": ["Structured Question List", "Simple Query Language", "Structured Query Language", "Standard Question Logic"],
+                    "correct_answer": 2,
+                    "explanation": "SQL stands for Structured Query Language, used for managing relational databases.",
+                    "topic": "Database"
+                },
+                {
+                    "id": 10,
+                    "question": "Which of these is a containerization tool?",
+                    "options": ["Kubernetes", "Docker", "Jenkins", "Ansible"],
+                    "correct_answer": 1,
+                    "explanation": "Docker is a platform for developing, shipping, and running applications in containers.",
+                    "topic": "DevOps"
                 }
             ]
         }
