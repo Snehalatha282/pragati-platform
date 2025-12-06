@@ -9,28 +9,28 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 def require_admin():
     if not current_user.is_authenticated or current_user.role != 'admin':
         flash('Access denied. Admin privileges required.', 'error')
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard.home'))
 
-@admin_bp.route('/')
+
+@admin_bp.route('/dashboard')
 @login_required
 def dashboard():
-    # Get statistics for admin dashboard
     total_users = User.query.count()
     total_jobs = Job.query.filter_by(is_active=True).count()
     total_courses = Course.query.count()
     active_mentorships = MentorConnection.query.filter_by(status='accepted').count()
-    
-    # Recent activities
+
     recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
     recent_jobs = Job.query.order_by(Job.posted_at.desc()).limit(5).all()
-    
+
     return render_template('admin/dashboard.html',
-                         total_users=total_users,
-                         total_jobs=total_jobs,
-                         total_courses=total_courses,
-                         active_mentorships=active_mentorships,
-                         recent_users=recent_users,
-                         recent_jobs=recent_jobs)
+                           total_users=total_users,
+                           total_jobs=total_jobs,
+                           total_courses=total_courses,
+                           active_mentorships=active_mentorships,
+                           recent_users=recent_users,
+                           recent_jobs=recent_jobs)
+
 
 @admin_bp.route('/users')
 @login_required

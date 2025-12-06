@@ -29,10 +29,11 @@
                 <span>Pragati</span>
             </a>
             
-            <div class="nav-menu" id="navMenu">
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard.home') }}" class="nav-link">
-                        <i class="fas fa-home"></i> Dashboard
+            <!-- <div class="nav-menu" id="navMenu">
+                 {% if current_user.is_authenticated %} 
+                 <a href="{{ url_for('dashboard.home') }}" class="nav-link">
+                        <i class="fas fa-home"></i> Dashboard 
+                    
                     </a>
                     <a href="{{ url_for('dashboard.skills') }}" class="nav-link">
                         <i class="fas fa-graduation-cap"></i> Skills
@@ -75,7 +76,66 @@
                         <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
                         <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Sign Up Free</a>
                     </div>
-                {% endif %}
+                {% endif %} -->
+                {% if current_user.is_authenticated and current_user.role != 'admin' %}
+
+    <a href="{{ url_for('dashboard.home') }}" class="nav-link">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+    <a href="{{ url_for('dashboard.skills') }}" class="nav-link">
+        <i class="fas fa-graduation-cap"></i> Skills
+    </a>
+    <a href="{{ url_for('jobs.job_listings') }}" class="nav-link">
+        <i class="fas fa-briefcase"></i> Jobs
+    </a>
+    <a href="{{ url_for('mentorship.mentor_list') }}" class="nav-link">
+        <i class="fas fa-hands-helping"></i> Mentorship
+    </a>
+    <a href="{{ url_for('dashboard.community') }}" class="nav-link">
+        <i class="fas fa-users"></i> Community
+    </a>
+
+    <div class="nav-user">
+        <img src="{{ current_user.profile_picture or url_for('static', filename='images/avatar-placeholder.png') }}"
+            alt="Profile" class="user-avatar">
+        <span>{{ current_user.first_name }}</span>
+        <i class="fas fa-chevron-down"></i>
+
+        <div class="user-dropdown">
+            <a href="{{ url_for('dashboard.profile') }}">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="{{ url_for('dashboard.settings') }}">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+{% elif current_user.is_authenticated and current_user.role == 'admin' %}
+
+    <a href="{{ url_for('admin.dashboard') }}" class="nav-link">
+        <i class="fas fa-user-shield"></i> Admin Panel
+    </a>
+    <a href="{{ url_for('auth.logout') }}" class="nav-link">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+
+{% else %}
+
+    <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#how-it-works" class="nav-link">How It Works</a>
+    <a href="#success-stories" class="nav-link">Success Stories</a>
+    <div class="nav-buttons">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Sign Up Free</a>
+    </div>
+
+{% endif %}
             </div>
             
             <button class="nav-toggle" id="navToggle">

@@ -79,3 +79,10 @@ def update_profile():
     data = request.json
     # Update user profile logic here
     return jsonify({'success': True, 'message': 'Profile updated successfully'})
+
+admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+@admin_bp.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('admin/dashboard.html')
