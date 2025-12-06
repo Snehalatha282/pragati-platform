@@ -105,6 +105,9 @@ def become_mentor():
             return render_template('mentorship/become_mentor.html', is_pending=True)
 
     if request.method == 'POST':
+        print("\n" + "="*50)
+        print("--- REACHED BECOME MENTOR POST ---")
+        print("="*50 + "\n")
         # Update user role to mentor
         current_user.role = 'mentor'
         current_user.bio = request.form.get('bio', '')

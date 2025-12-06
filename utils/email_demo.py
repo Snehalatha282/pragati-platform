@@ -10,7 +10,7 @@ def send_verification_email(mentor_name, company_name, verification_link):
     """
     
     # Configuration as per request
-    sender_email = "lincolodi095@gamil.com"
+    sender_email = "whitedevil752006@gmail.com"
     # In a real scenario, this would be the company_email passed in arguments.
     # For this demo/testing, we force it to the requested email.
     target_email = "ibrahimwani095@gmail.com"
@@ -38,13 +38,15 @@ def send_verification_email(mentor_name, company_name, verification_link):
     print("-" * 50)
     
     # REAL SMTP IMPLEMENTATION
-    mail_password = os.environ.get('MAIL_PASSWORD')
+    mail_password = os.environ.get('MAIL_PASSWORD', '').replace(' ', '')
     
     if not mail_password:
         print("WARNING: MAIL_PASSWORD not set. Email logged only (not sent).")
         return True
 
     try:
+        print(f"DEBUG: Attempting SMTP connection to smtp.gmail.com:587 as {sender_email}...")
+        
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = target_email
@@ -54,10 +56,19 @@ def send_verification_email(mentor_name, company_name, verification_link):
         # Connect to Gmail SMTP
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
+        
+        print(f"DEBUG: Attempting login with password length {len(mail_password)}...")
         server.login(sender_email, mail_password)
+        print("DEBUG: Login successful.")
+        
         server.send_message(msg)
         server.quit()
         print(f"SUCCESS: Email sent to {target_email} via SMTP.")
+    except smtplib.SMTPAuthenticationError:
+        print("ERROR: Authentication Failed. Please check:")
+        print("1. Is 2-Step Verification ON?")
+        print("2. Are you using an App Password (not login password)?")
+        return False
     except Exception as e:
         print(f"SMTP Error: {e}")
         return False

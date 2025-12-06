@@ -3,8 +3,15 @@ import smtplib
 import os
 import sys
 
-# Read variables
-sender = "whitedevil752006@gmail.com"
+from utils.email_demo import send_verification_email
+import re
+
+# Extract sender from file manually to avoid import issues if app context needed
+with open('utils/email_demo.py', 'r') as f:
+    content = f.read()
+    match = re.search(r'sender_email\s*=\s*"([^"]+)"', content)
+    sender = match.group(1) if match else "UNKNOWN"
+
 password = os.environ.get('MAIL_PASSWORD')
 
 print(f"--- Email Debugger ---")
@@ -20,6 +27,11 @@ if len(password) < 16:
     print("WARNING: Password looks too short to be an App Password (usually 16 chars).")
 
 print("\nAttempting to connect to Gmail SMTP...")
+
+if "@gmail.com" not in sender and "sit.ac.in" in sender:
+    print(f"\n⚠️ WARNING: You are using '{sender}' but the code connects to 'smtp.gmail.com'.")
+    print("Likely Cause: 'sit.ac.in' is NOT a Gmail address (or requires different SMTP settings).")
+    print("Recommendation: Use a personal @gmail.com address for this demo code.")
 
 try:
     server = smtplib.SMTP('smtp.gmail.com', 587)
