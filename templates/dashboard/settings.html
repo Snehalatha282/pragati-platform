@@ -1,0 +1,1117 @@
+{% extends "templates/dashboard/base.html" %}
+
+{% block title %}Settings - Pragati{% endblock %}
+
+{% block dashboard_content %}
+<div class="settings-header">
+    <h1>Account Settings</h1>
+    <p>Manage your account preferences and security settings</p>
+</div>
+
+<div class="settings-container">
+    <!-- Tabs Navigation -->
+    <div class="settings-tabs">
+        <button class="tab-btn active" data-tab="profile">Profile Settings</button>
+        <button class="tab-btn" data-tab="security">Security</button>
+        <button class="tab-btn" data-tab="notifications">Notifications</button>
+        <button class="tab-btn" data-tab="privacy">Privacy</button>
+        <button class="tab-btn" data-tab="advanced">Advanced</button>
+    </div>
+
+    <!-- Profile Settings Tab -->
+    <div class="tab-content active" id="profile">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Profile Information</h2>
+            </div>
+            <div class="card-body">
+                <form id="profileSettingsForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="displayName" class="form-label">Display Name</label>
+                            <input type="text" id="displayName" class="form-control" 
+                                   value="{{ current_user.first_name }} {{ current_user.last_name }}">
+                            <small class="form-text">This is how your name appears to others</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="timezone" class="form-label">Timezone</label>
+                            <select id="timezone" class="form-control">
+                                <option value="UTC">UTC</option>
+                                <option value="IST" selected>India Standard Time (IST)</option>
+                                <option value="EST">Eastern Time (EST)</option>
+                                <option value="PST">Pacific Time (PST)</option>
+                                <option value="GMT">Greenwich Mean Time (GMT)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="language" class="form-label">Preferred Language</label>
+                        <select id="language" class="form-control">
+                            <option value="en" selected>English</option>
+                            <option value="hi">Hindi</option>
+                            <option value="ta">Tamil</option>
+                            <option value="te">Telugu</option>
+                            <option value="kn">Kannada</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jobAlerts" class="form-label">Job Alert Frequency</label>
+                        <select id="jobAlerts" class="form-control">
+                            <option value="daily">Daily</option>
+                            <option value="weekly" selected>Weekly</option>
+                            <option value="biweekly">Bi-weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="none">Never</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="emailDigest" checked>
+                            <span class="checkmark"></span>
+                            Receive weekly career digest email
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="mentorUpdates" checked>
+                            <span class="checkmark"></span>
+                            Notify me about new mentorship opportunities
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="reset" class="btn btn-outline">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Tab -->
+    <div class="tab-content" id="security">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Change Password</h2>
+            </div>
+            <div class="card-body">
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" id="currentPassword" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" id="newPassword" class="form-control">
+                        <div class="password-strength">
+                            <div class="strength-bar"></div>
+                            <span id="passwordStrength">Password strength</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" class="form-control">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Two-Factor Authentication</h2>
+            </div>
+            <div class="card-body">
+                <div class="two-factor-info">
+                    <div class="two-factor-status">
+                        <i class="fas fa-shield-alt"></i>
+                        <div>
+                            <h4>Two-Factor Authentication</h4>
+                            <p>Add an extra layer of security to your account</p>
+                        </div>
+                    </div>
+                    
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="twoFactorToggle">
+                        <label for="twoFactorToggle" class="toggle-slider"></label>
+                    </div>
+                </div>
+                
+                <div class="two-factor-setup" id="twoFactorSetup" style="display: none;">
+                    <div class="setup-step">
+                        <h5>1. Download Authenticator App</h5>
+                        <p>Get Google Authenticator or Authy from your app store</p>
+                    </div>
+                    
+                    <div class="setup-step">
+                        <h5>2. Scan QR Code</h5>
+                        <div class="qr-code-placeholder">
+                            <div class="qr-simulated">
+                                <div class="qr-pattern"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-step">
+                        <h5>3. Enter Verification Code</h5>
+                        <input type="text" class="form-control" placeholder="6-digit code" maxlength="6">
+                    </div>
+                    
+                    <button class="btn btn-primary btn-sm">Verify & Enable</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Active Sessions</h2>
+            </div>
+            <div class="card-body">
+                <div class="session-list">
+                    <div class="session-item">
+                        <div class="session-info">
+                            <i class="fas fa-desktop"></i>
+                            <div>
+                                <h5>Chrome on Windows</h5>
+                                <p>Current session • Bangalore, India</p>
+                                <small>Last active: Just now</small>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" disabled>Current</button>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-info">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div>
+                                <h5>Safari on iPhone</h5>
+                                <p>Mobile device • Mumbai, India</p>
+                                <small>Last active: 2 days ago</small>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger btn-sm">Revoke</button>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <button class="btn btn-outline">Revoke All Other Sessions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Tab -->
+    <div class="tab-content" id="notifications">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Email Notifications</h2>
+            </div>
+            <div class="card-body">
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Course Updates</h4>
+                        <p>Get notified about new course materials and deadlines</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="courseNotifications" checked>
+                        <label for="courseNotifications" class="toggle-slider"></label>
+                    </div>
+                </div>
+                
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Job Matches</h4>
+                        <p>Receive alerts when new jobs match your profile</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="jobNotifications" checked>
+                        <label for="jobNotifications" class="toggle-slider"></label>
+                    </div>
+                </div>
+                
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Mentor Messages</h4>
+                        <p>Get notified when your mentor sends messages</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="mentorNotifications" checked>
+                        <label for="mentorNotifications" class="toggle-slider"></label>
+                    </div>
+                </div>
+                
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Community Activity</h4>
+                        <p>Notifications about community posts and replies</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="communityNotifications">
+                        <label for="communityNotifications" class="toggle-slider"></label>
+                    </div>
+                </div>
+                
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Platform Announcements</h4>
+                        <p>Important updates about Pragati platform</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="announcementNotifications" checked>
+                        <label for="announcementNotifications" class="toggle-slider"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Push Notifications</h2>
+            </div>
+            <div class="card-body">
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Browser Notifications</h4>
+                        <p>Receive real-time notifications in your browser</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="browserNotifications">
+                        <label for="browserNotifications" class="toggle-slider"></label>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="requestNotificationPermission">
+                    <i class="fas fa-bell"></i> Enable Browser Notifications
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Tab -->
+    <div class="tab-content" id="privacy">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Profile Visibility</h2>
+            </div>
+            <div class="card-body">
+                <div class="privacy-setting">
+                    <div class="setting-info">
+                        <h4>Profile Visibility</h4>
+                        <p>Control who can see your profile information</p>
+                    </div>
+                    <select class="form-control" style="width: 200px;">
+                        <option value="public">Public (Recommended)</option>
+                        <option value="mentors_only">Mentors Only</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
+                
+                <div class="privacy-setting">
+                    <div class="setting-info">
+                        <h4>Show Career Break</h4>
+                        <p>Display career break duration on your profile</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="showCareerBreak" checked>
+                        <label for="showCareerBreak" class="toggle-slider"></label>
+                    </div>
+                </div>
+                
+                <div class="privacy-setting">
+                    <div class="setting-info">
+                        <h4>Show Skills to Employers</h4>
+                        <p>Allow employers to see your skills during job matching</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="showSkills" checked>
+                        <label for="showSkills" class="toggle-slider"></label>
+                    </div>
+                </div>
+                
+                <div class="privacy-setting">
+                    <div class="setting-info">
+                        <h4>Show Course Progress</h4>
+                        <p>Display your course completion progress publicly</p>
+                    </div>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="showCourseProgress">
+                        <label for="showCourseProgress" class="toggle-slider"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Data & Privacy</h2>
+            </div>
+            <div class="card-body">
+                <div class="data-options">
+                    <button class="data-btn" id="exportData">
+                        <i class="fas fa-download"></i>
+                        <span>Export My Data</span>
+                        <small>Download all your personal data</small>
+                    </button>
+                    
+                    <button class="data-btn" id="viewData">
+                        <i class="fas fa-eye"></i>
+                        <span>View Stored Data</span>
+                        <small>See what information we have</small>
+                    </button>
+                    
+                    <button class="data-btn danger" id="deleteAccount">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Delete Account</span>
+                        <small>Permanently delete your account</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Tab -->
+    <div class="tab-content" id="advanced">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">API Access</h2>
+            </div>
+            <div class="card-body">
+                <div class="api-info">
+                    <p>Access your data programmatically using our API</p>
+                    <div class="api-key-container">
+                        <div class="api-key-display">
+                            <code id="apiKey">pragati_sk_••••••••••••••••••••••••</code>
+                        </div>
+                        <button class="btn btn-outline btn-sm" id="copyApiKey">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="btn btn-outline btn-sm" id="regenerateApiKey">
+                            <i class="fas fa-redo"></i> Regenerate
+                        </button>
+                    </div>
+                    <small class="form-text">Keep your API key secret. Never share it publicly.</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Integration Settings</h2>
+            </div>
+            <div class="card-body">
+                <div class="integration-setting">
+                    <div class="setting-info">
+                        <h4>Google Calendar Integration</h4>
+                        <p>Sync your mentorship sessions and course deadlines</p>
+                    </div>
+                    <button class="btn btn-outline btn-sm">Connect</button>
+                </div>
+                
+                <div class="integration-setting">
+                    <div class="setting-info">
+                        <h4>LinkedIn Integration</h4>
+                        <p>Import your professional profile and connections</p>
+                    </div>
+                    <button class="btn btn-outline btn-sm">Connect</button>
+                </div>
+                
+                <div class="integration-setting">
+                    <div class="setting-info">
+                        <h4>GitHub Integration</h4>
+                        <p>Showcase your coding projects and contributions</p>
+                    </div>
+                    <button class="btn btn-outline btn-sm">Connect</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Advanced Preferences</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="dataRetention" class="form-label">Data Retention Period</label>
+                    <select id="dataRetention" class="form-control">
+                        <option value="30">30 days</option>
+                        <option value="90" selected>90 days</option>
+                        <option value="180">6 months</option>
+                        <option value="365">1 year</option>
+                        <option value="forever">Forever</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="analyticsOptIn" checked>
+                        <span class="checkmark"></span>
+                        Share anonymous usage data to improve Pragati
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="betaFeatures">
+                        <span class="checkmark"></span>
+                        Opt into beta features and early access
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Delete Account</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>Are you absolutely sure?</h4>
+                <p>This action cannot be undone. This will permanently delete your Pragati account and remove all your data from our servers.</p>
+            </div>
+            
+            <div class="delete-confirm">
+                <label for="deleteConfirm" class="form-label">
+                    Type "DELETE" to confirm:
+                </label>
+                <input type="text" id="deleteConfirm" class="form-control" placeholder="DELETE">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelDelete">Cancel</button>
+            <button class="btn btn-danger" id="confirmDelete" disabled>Delete Account</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.settings-header {
+    margin-bottom: 2rem;
+}
+
+.settings-header h1 {
+    font-size: 2rem;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.settings-header p {
+    color: var(--gray-dark);
+}
+
+.settings-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--gray-light);
+    padding-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--gray);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+    background: rgba(138, 43, 226, 0.05);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.notification-setting,
+.privacy-setting,
+.integration-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.notification-setting:last-child,
+.privacy-setting:last-child,
+.integration-setting:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.setting-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+}
+
+.setting-info p {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+.two-factor-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.two-factor-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.two-factor-status i {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.two-factor-setup {
+    padding: 1.5rem;
+    background: var(--light-color);
+    border-radius: var(--radius);
+    margin-top: 1.5rem;
+}
+
+.setup-step {
+    margin-bottom: 1.5rem;
+}
+
+.setup-step h5 {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.setup-step p {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+.qr-code-placeholder {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.qr-simulated {
+    width: 150px;
+    height: 150px;
+    background: white;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.qr-pattern {
+    width: 120px;
+    height: 120px;
+    background: 
+        linear-gradient(90deg, 
+            transparent 49%, 
+            var(--dark-color) 49%, 
+            var(--dark-color) 51%, 
+            transparent 51%
+        ),
+        linear-gradient(0deg, 
+            transparent 49%, 
+            var(--dark-color) 49%, 
+            var(--dark-color) 51%, 
+            transparent 51%
+        ),
+        repeating-linear-gradient(90deg, 
+            transparent, 
+            transparent 15px, 
+            #f0f0f0 15px, 
+            #f0f0f0 30px
+        ),
+        repeating-linear-gradient(0deg, 
+            transparent, 
+            transparent 15px, 
+            #f0f0f0 15px, 
+            #f0f0f0 30px
+        );
+}
+
+.session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+}
+
+.session-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.session-info i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.session-info h5 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+}
+
+.session-info p {
+    color: var(--gray);
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.session-info small {
+    color: var(--gray);
+    font-size: 0.75rem;
+}
+
+.data-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.data-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+    background: var(--light-color);
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    color: var(--dark-color);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.data-btn:hover {
+    background: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.data-btn.danger:hover {
+    border-color: var(--danger-color);
+}
+
+.data-btn i {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+}
+
+.data-btn.danger i {
+    color: var(--danger-color);
+}
+
+.data-btn span {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.data-btn small {
+    color: var(--gray);
+    font-size: 0.875rem;
+}
+
+.api-key-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.api-key-display {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: var(--light-color);
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    font-family: monospace;
+    font-size: 0.875rem;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 500px;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.modal-header h3 {
+    font-size: 1.25rem;
+    color: var(--dark-color);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--gray);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.warning-message {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.warning-message i {
+    font-size: 3rem;
+    color: var(--warning-color);
+    margin-bottom: 1rem;
+}
+
+.warning-message h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: var(--dark-color);
+}
+
+.warning-message p {
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+.delete-confirm {
+    margin-top: 1.5rem;
+}
+
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-bar {
+    height: 4px;
+    background: var(--gray-light);
+    border-radius: 2px;
+    margin-bottom: 0.25rem;
+}
+
+#passwordStrength {
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+@media (max-width: 768px) {
+    .settings-tabs {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .tab-btn {
+        width: 100%;
+        text-align: left;
+        border-radius: var(--radius);
+        border-bottom: none;
+    }
+    
+    .tab-btn.active {
+        background: rgba(138, 43, 226, 0.1);
+    }
+    
+    .notification-setting,
+    .privacy-setting,
+    .integration-setting {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .data-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .api-key-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // Remove active class from all tabs
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+    
+    // Two-factor authentication toggle
+    const twoFactorToggle = document.getElementById('twoFactorToggle');
+    const twoFactorSetup = document.getElementById('twoFactorSetup');
+    
+    if (twoFactorToggle) {
+        twoFactorToggle.addEventListener('change', function() {
+            twoFactorSetup.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+    
+    // Password strength indicator
+    const newPasswordInput = document.getElementById('newPassword');
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = this.parentElement.querySelector('.strength-bar');
+            const strengthText = this.parentElement.querySelector('#passwordStrength');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            const strengthMap = {
+                0: {text: 'Very Weak', color: '#ef4444', width: '25%'},
+                1: {text: 'Weak', color: '#f59e0b', width: '25%'},
+                2: {text: 'Fair', color: '#f59e0b', width: '50%'},
+                3: {text: 'Good', color: '#10b981', width: '75%'},
+                4: {text: 'Strong', color: '#10b981', width: '100%'}
+            };
+            
+            const current = strengthMap[strength];
+            strengthBar.style.width = current.width;
+            strengthBar.style.backgroundColor = current.color;
+            strengthText.textContent = current.text;
+            strengthText.style.color = current.color;
+        });
+    }
+    
+    // Form submissions
+    const profileForm = document.getElementById('profileSettingsForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Save profile settings
+            alert('Profile settings saved successfully!');
+        });
+    }
+    
+    const passwordForm = document.getElementById('passwordForm');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Change password logic
+            alert('Password updated successfully!');
+        });
+    }
+    
+    // Browser notifications permission
+    const requestNotificationBtn = document.getElementById('requestNotificationPermission');
+    if (requestNotificationBtn) {
+        requestNotificationBtn.addEventListener('click', function() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        alert('Browser notifications enabled!');
+                    }
+                });
+            } else if (Notification.permission === 'granted') {
+                alert('Notifications are already enabled.');
+            } else {
+                alert('Notifications are blocked. Please enable them in browser settings.');
+            }
+        });
+    }
+    
+    // Delete account modal
+    const deleteBtn = document.getElementById('deleteAccount');
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    const deleteConfirmInput = document.getElementById('deleteConfirm');
+    const modalCloseBtn = document.querySelector('.modal-close');
+    
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            deleteModal.classList.add('active');
+        });
+    }
+    
+    // Close modal functions
+    function closeModal() {
+        deleteModal.classList.remove('active');
+        deleteConfirmInput.value = '';
+        confirmDeleteBtn.disabled = true;
+    }
+    
+    if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', closeModal);
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    
+    // Confirm delete validation
+    if (deleteConfirmInput) {
+        deleteConfirmInput.addEventListener('input', function() {
+            confirmDeleteBtn.disabled = this.value !== 'DELETE';
+        });
+    }
+    
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (confirm('Are you absolutely sure? This cannot be undone!')) {
+                // Delete account logic
+                alert('Account deletion requested. You will be logged out.');
+                setTimeout(() => {
+                    window.location.href = '/auth/logout';
+                }, 2000);
+                closeModal();
+            }
+        });
+    }
+    
+    // API key copy
+    const copyApiKeyBtn = document.getElementById('copyApiKey');
+    if (copyApiKeyBtn) {
+        copyApiKeyBtn.addEventListener('click', function() {
+            const apiKey = document.getElementById('apiKey').textContent;
+            navigator.clipboard.writeText(apiKey).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+    }
+    
+    // Data export
+    const exportDataBtn = document.getElementById('exportData');
+    if (exportDataBtn) {
+        exportDataBtn.addEventListener('click', function() {
+            // Export data logic
+            alert('Data export started. You will receive an email with your data shortly.');
+        });
+    }
+    
+    // Close modal on outside click
+    deleteModal.addEventListener('click', function(e) {
+        if (e.target === deleteModal) {
+            closeModal();
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -86,3 +86,96 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 @login_required
 def dashboard():
     return render_template('admin/dashboard.html')
+
+# routes/dashboard.py (add these imports and routes)
+from utils.gemini_assessment import GeminiAssessment
+import json
+
+@dashboard_bp.route('/api/assess-skills', methods=['POST'])
+@login_required
+def assess_skills():
+    """API endpoint for skill assessment using Gemini"""
+    try:
+        data = request.json
+        assessment_type = data.get('type', 'technical')
+        
+        # Prepare user data for assessment
+        user_data = {
+            'previous_role': current_user.previous_role or 'Not specified',
+            'desired_role': current_user.desired_role or 'Not specified',
+            'career_break_years': current_user.career_break_years or 0,
+            'skills': current_user.skills or '',
+            'location': current_user.location or ''
+        }
+        
+        # Try Gemini API if key exists
+        gemini_api_key = os.getenv('GEMINI_API_KEY')
+        
+        if gemini_api_key:
+            try:
+                assessor = GeminiAssessment()
+                result = assessor.assess_skills(user_data, assessment_type)
+            except Exception as e:
+                # Fallback to mock if Gemini fails
+                assessor = GeminiAssessment()
+                result = assessor.mock_assessment(user_data)
+                result['warning'] = 'Using mock data: ' + str(e)
+        else:
+            # Use mock data if no API key
+            assessor = GeminiAssessment()
+            result = assessor.mock_assessment(user_data)
+            result['info'] = 'Using mock data. Set GEMINI_API_KEY for real assessments.'
+        
+        # Save assessment to database
+        assessment = Assessment(
+            user_id=current_user.id,
+            assessment_type=assessment_type,
+            result_data=json.dumps(result),
+            completed_at=datetime.utcnow()
+        )
+        db.session.add(assessment)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'assessment': result,
+            'assessment_id': assessment.id
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@dashboard_bp.route('/api/generate-learning-path', methods=['POST'])
+@login_required
+def generate_learning_path():
+    """Generate personalized learning path"""
+    try:
+        data = request.json
+        skill_gaps = data.get('skill_gaps', [])
+        user_level = data.get('level', 'beginner')
+        
+        assessor = GeminiAssessment()
+        
+        # Try Gemini or use mock
+        gemini_api_key = os.getenv('GEMINI_API_KEY')
+        if gemini_api_key:
+            try:
+                learning_path = assessor.generate_learning_path(skill_gaps, user_level)
+            except:
+                learning_path = assessor._default_learning_path(skill_gaps, user_level)
+        else:
+            learning_path = assessor._default_learning_path(skill_gaps, user_level)
+        
+        return jsonify({
+            'success': True,
+            'learning_path': learning_path
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
