@@ -143,3 +143,10 @@ def recommended_jobs():
         'location': job.location,
         'job_type': job.job_type
     } for job in jobs])
+
+# In routes/jobs.py - Missing route
+@jobs_bp.route('/applications/<int:application_id>/status', methods=['POST'])
+@login_required
+def update_application_status(application_id):
+    # Missing handler for updating application status
+    pass

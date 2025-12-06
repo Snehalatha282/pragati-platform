@@ -17,3 +17,6 @@ class Config:
     MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', True)
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+
+    USE_GEMINI = os.getenv('USE_GEMINI', 'False').lower() == 'true'
+    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')

@@ -1,0 +1,1041 @@
+{% extends "admin/dashboard.html" %}
+
+
+{% block admin_content %}
+<div class="admin-header">
+    <div class="header-content">
+        <h1>Job Management</h1>
+        <p>Manage job listings, analyze trends, and optimize job matching</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-primary" id="addJobBtn">
+            <i class="fas fa-plus"></i> Add New Job
+        </button>
+        <button class="btn btn-outline" id="analyzeTrendsBtn">
+            <i class="fas fa-chart-line"></i> Analyze Trends
+        </button>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <h3>Active Jobs</h3>
+            <i class="fas fa-briefcase"></i>
+        </div>
+        <div class="stat-body">
+            <div class="stat-value">{{ jobs.total }}</div>
+            <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i> 12% this month
+            </div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <h3>Total Applications</h3>
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="stat-body">
+            <div class="stat-value">1,248</div>
+            <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i> 18% this month
+            </div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <h3>Match Rate</h3>
+            <i class="fas fa-percentage"></i>
+        </div>
+        <div class="stat-body">
+            <div class="stat-value">68%</div>
+            <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i> 5% this month
+            </div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <h3>Avg Time to Fill</h3>
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-body">
+            <div class="stat-value">21 days</div>
+            <div class="stat-trend negative">
+                <i class="fas fa-arrow-down"></i> 3 days faster
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Job Filters -->
+<div class="filter-card">
+    <div class="filter-header">
+        <h3>Filters</h3>
+        <button class="btn btn-link" id="clearFilters">Clear All</button>
+    </div>
+    <div class="filter-body">
+        <div class="filter-row">
+            <div class="filter-field">
+                <label class="filter-label">Status</label>
+                <select class="form-control" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="expired">Expired</option>
+                </select>
+            </div>
+            
+            <div class="filter-field">
+                <label class="filter-label">Job Type</label>
+                <select class="form-control" id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="full-time">Full Time</option>
+                    <option value="part-time">Part Time</option>
+                    <option value="remote">Remote</option>
+                    <option value="flexible">Flexible</option>
+                </select>
+            </div>
+            
+            <div class="filter-field">
+                <label class="filter-label">Date Posted</label>
+                <select class="form-control" id="dateFilter">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+            
+            <div class="filter-field">
+                <label class="filter-label">Search</label>
+                <input type="text" class="form-control" id="searchFilter" placeholder="Job title, company...">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Job List Table -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Job Listings</h2>
+        <div class="card-actions">
+            <button class="btn btn-outline btn-sm" id="exportJobs">
+                <i class="fas fa-download"></i> Export
+            </button>
+            <button class="btn btn-outline btn-sm" id="bulkActions">
+                <i class="fas fa-cog"></i> Bulk Actions
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table" id="jobsTable">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll">
+                        </th>
+                        <th>Job Title</th>
+                        <th>Company</th>
+                        <th>Type</th>
+                        <th>Applications</th>
+                        <th>Status</th>
+                        <th>Posted Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs.items %}
+                    <tr data-job-id="{{ job.id }}">
+                        <td>
+                            <input type="checkbox" class="job-select" value="{{ job.id }}">
+                        </td>
+                        <td>
+                            <strong>{{ job.title }}</strong>
+                            <br>
+                            <small class="text-muted">{{ job.location }}</small>
+                        </td>
+                        <td>{{ job.company }}</td>
+                        <td>
+                            <span class="badge badge-primary">{{ job.job_type }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ job.applications|length if job.applications else 0 }}</strong>
+                            <br>
+                            <small>Matches: {{ (job.applications|selectattr('status', 'equalto', 'hired')|list|length if job.applications else 0) }}</small>
+                        </td>
+                        <td>
+                            {% if job.is_active %}
+                            <span class="badge badge-success">Active</span>
+                            {% else %}
+                            <span class="badge badge-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ job.posted_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline view-job" data-id="{{ job.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline edit-job" data-id="{{ job.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline toggle-job" data-id="{{ job.id }}" data-active="{{ job.is_active }}">
+                                    {% if job.is_active %}
+                                    <i class="fas fa-pause"></i>
+                                    {% else %}
+                                    <i class="fas fa-play"></i>
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if jobs.pages > 1 %}
+        <div class="pagination">
+            {% if jobs.has_prev %}
+            <a href="{{ url_for('admin.jobs', page=jobs.prev_num) }}" class="page-link">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+            {% endif %}
+            
+            <div class="page-numbers">
+                {% for page_num in jobs.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+                    {% if page_num %}
+                        {% if page_num == jobs.page %}
+                        <span class="page-number active">{{ page_num }}</span>
+                        {% else %}
+                        <a href="{{ url_for('admin.jobs', page=page_num) }}" class="page-number">
+                            {{ page_num }}
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        <span class="page-dots">...</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            {% if jobs.has_next %}
+            <a href="{{ url_for('admin.jobs', page=jobs.next_num) }}" class="page-link">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- AI Analysis Section -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="fas fa-robot"></i> AI Job Market Analysis
+        </h2>
+        <button class="btn btn-primary btn-sm" id="runAnalysis">
+            <i class="fas fa-magic"></i> Run Analysis
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="analysis-container" id="analysisContainer">
+            <div class="analysis-placeholder">
+                <i class="fas fa-chart-bar"></i>
+                <h4>No analysis yet</h4>
+                <p>Run AI analysis to get insights on job market trends</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Job Modal -->
+<div class="modal" id="addJobModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add New Job</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form id="addJobForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Job Title *</label>
+                    <input type="text" class="form-control" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Company *</label>
+                    <input type="text" class="form-control" name="company" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" name="location">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Job Type</label>
+                        <select class="form-control" name="job_type">
+                            <option value="full-time">Full Time</option>
+                            <option value="part-time">Part Time</option>
+                            <option value="remote">Remote</option>
+                            <option value="flexible">Flexible</option>
+                            <option value="contract">Contract</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description *</label>
+                    <textarea class="form-control" name="description" rows="4" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Requirements</label>
+                    <textarea class="form-control" name="requirements" rows="3"></textarea>
+                    <small class="form-text">Separate requirements with commas</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Skills Required</label>
+                    <input type="text" class="form-control" name="skills_required" placeholder="Python, JavaScript, React...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Salary Range</label>
+                    <input type="text" class="form-control" name="salary_range" placeholder="e.g., $60,000 - $80,000">
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" name="is_active" checked>
+                        <span class="checkmark"></span>
+                        Activate job immediately
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="cancelAddJob">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Job</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Analysis Results Modal -->
+<div class="modal" id="analysisModal">
+    <div class="modal-content wide">
+        <div class="modal-header">
+            <h3>AI Job Market Analysis</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="analysis-results" id="analysisResults">
+                <!-- Results will be loaded here -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" id="closeAnalysis">Close</button>
+            <button class="btn btn-primary" id="exportAnalysis">
+                <i class="fas fa-download"></i> Export Report
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-content h1 {
+    font-size: 1.75rem;
+    color: var(--dark-color);
+    margin-bottom: 0.25rem;
+}
+
+.header-content p {
+    color: var(--gray);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stat-header h3 {
+    font-size: 0.875rem;
+    color: var(--gray);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-header i {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+}
+
+.stat-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.stat-trend.positive {
+    color: var(--success-color);
+}
+
+.stat-trend.negative {
+    color: var(--danger-color);
+}
+
+.filter-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.filter-header h3 {
+    font-size: 1.125rem;
+    color: var(--dark-color);
+}
+
+.filter-body {
+    padding: 1.5rem;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    background: var(--light-color);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--gray-light);
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-light);
+    vertical-align: middle;
+}
+
+.table tr:hover {
+    background: #f8fafc;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.analysis-container {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.analysis-placeholder {
+    text-align: center;
+    color: var(--gray);
+}
+
+.analysis-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--gray-light);
+}
+
+.analysis-placeholder h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.modal.wide .modal-content {
+    max-width: 800px;
+}
+
+.analysis-results {
+    padding: 1rem;
+}
+
+.analysis-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.analysis-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.analysis-section h4 {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.analysis-section h4 i {
+    color: var(--primary-color);
+}
+
+.skill-demand {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.skill-tag {
+    padding: 0.5rem 1rem;
+    background: var(--light-color);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.skill-tag.high-demand {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.skill-tag.medium-demand {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.skill-tag.low-demand {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.recommendation-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.recommendation-list li {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: var(--light-color);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--primary-color);
+}
+
+.insight-card {
+    background: white;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.insight-card h5 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.insight-card p {
+    color: var(--gray-dark);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal functionality
+    const addJobBtn = document.getElementById('addJobBtn');
+    const addJobModal = document.getElementById('addJobModal');
+    const cancelAddJob = document.getElementById('cancelAddJob');
+    const modalClose = document.querySelectorAll('.modal-close');
+    
+    // Open add job modal
+    if (addJobBtn) {
+        addJobBtn.addEventListener('click', function() {
+            addJobModal.style.display = 'flex';
+        });
+    }
+    
+    // Close modal functions
+    function closeModal(modal) {
+        modal.style.display = 'none';
+    }
+    
+    if (cancelAddJob) {
+        cancelAddJob.addEventListener('click', function() {
+            closeModal(addJobModal);
+        });
+    }
+    
+    modalClose.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            closeModal(modal);
+        });
+    });
+    
+    // Close modal on outside click
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal(this);
+            }
+        });
+    });
+    
+    // Toggle job status
+    const toggleButtons = document.querySelectorAll('.toggle-job');
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            const jobId = this.getAttribute('data-id');
+            const isActive = this.getAttribute('data-active') === 'true';
+            
+            try {
+                const response = await fetch(`/admin/jobs/${jobId}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const icon = this.querySelector('i');
+                    if (isActive) {
+                        icon.classList.remove('fa-pause');
+                        icon.classList.add('fa-play');
+                        this.setAttribute('data-active', 'false');
+                        // Update status badge in table row
+                        const row = this.closest('tr');
+                        const badge = row.querySelector('.badge');
+                        badge.className = 'badge badge-secondary';
+                        badge.textContent = 'Inactive';
+                    } else {
+                        icon.classList.remove('fa-play');
+                        icon.classList.add('fa-pause');
+                        this.setAttribute('data-active', 'true');
+                        // Update status badge
+                        const row = this.closest('tr');
+                        const badge = row.querySelector('.badge');
+                        badge.className = 'badge badge-success';
+                        badge.textContent = 'Active';
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling job:', error);
+            }
+        });
+    });
+    
+    // AI Job Analysis
+    const runAnalysisBtn = document.getElementById('runAnalysis');
+    const analysisModal = document.getElementById('analysisModal');
+    const analysisContainer = document.getElementById('analysisContainer');
+    const analysisResults = document.getElementById('analysisResults');
+    const closeAnalysis = document.getElementById('closeAnalysis');
+    
+    if (runAnalysisBtn) {
+        runAnalysisBtn.addEventListener('click', async function() {
+            runAnalysisBtn.disabled = true;
+            runAnalysisBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            
+            // Show loading in container
+            analysisContainer.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Analyzing job market trends with AI...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/admin/api/analyze-jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayAnalysisResults(data.analysis);
+                    analysisModal.style.display = 'flex';
+                } else {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                alert('Error running analysis: ' + error.message);
+                analysisContainer.innerHTML = `
+                    <div class="analysis-placeholder">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Analysis Failed</h4>
+                        <p>${error.message}</p>
+                        <button class="btn btn-outline" onclick="location.reload()">Retry</button>
+                    </div>
+                `;
+            } finally {
+                runAnalysisBtn.disabled = false;
+                runAnalysisBtn.innerHTML = '<i class="fas fa-magic"></i> Run Analysis';
+            }
+        });
+    }
+    
+    function displayAnalysisResults(analysis) {
+        let html = '';
+        
+        if (analysis.error) {
+            html = `
+                <div class="alert alert-danger">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Analysis Error</h4>
+                    <p>${analysis.error}</p>
+                    <p>Using mock data for demonstration.</p>
+                </div>
+            `;
+            
+            // Use mock data
+            analysis = getMockAnalysis();
+        }
+        
+        // Skill Demand Analysis
+        if (analysis.skill_demand) {
+            html += `
+                <div class="analysis-section">
+                    <h4><i class="fas fa-chart-bar"></i> Skill Demand Analysis</h4>
+                    <p>Based on current job listings and market trends</p>
+                    
+                    <div class="skill-demand">
+            `;
+            
+            analysis.skill_demand.forEach(skill => {
+                let demandClass = 'medium-demand';
+                if (skill.demand === 'high') demandClass = 'high-demand';
+                if (skill.demand === 'low') demandClass = 'low-demand';
+                
+                html += `
+                    <span class="skill-tag ${demandClass}">
+                        <i class="fas fa-${skill.trend === 'up' ? 'arrow-up' : 'arrow-down'}"></i>
+                        ${skill.name} (${skill.count})
+                    </span>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Market Insights
+        if (analysis.market_insights) {
+            html += `
+                <div class="analysis-section">
+                    <h4><i class="fas fa-lightbulb"></i> Market Insights</h4>
+                    
+                    <div class="insights-grid">
+            `;
+            
+            analysis.market_insights.forEach(insight => {
+                html += `
+                    <div class="insight-card">
+                        <h5><i class="fas fa-${insight.icon || 'chart-line'}"></i> ${insight.title}</h5>
+                        <p>${insight.description}</p>
+                        ${insight.recommendation ? `<small><strong>Recommendation:</strong> ${insight.recommendation}</small>` : ''}
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+        
+        // AI Recommendations
+        if (analysis.recommendations) {
+            html += `
+                <div class="analysis-section">
+                    <h4><i class="fas fa-robot"></i> AI Recommendations</h4>
+                    
+                    <ul class="recommendation-list">
+            `;
+            
+            analysis.recommendations.forEach(rec => {
+                html += `
+                    <li>
+                        <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                        ${rec}
+                    </li>
+                `;
+            });
+            
+            html += `
+                    </ul>
+                </div>
+            `;
+        }
+        
+        // Gemini Analysis
+        if (analysis.gemini_analysis) {
+            html += `
+                <div class="analysis-section">
+                    <h4><i class="fas fa-brain"></i> AI-Powered Insights</h4>
+                    <div class="gemini-analysis">
+                        <p>${analysis.gemini_analysis}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        analysisResults.innerHTML = html;
+    }
+    
+    function getMockAnalysis() {
+        return {
+            skill_demand: [
+                { name: 'Python', count: 45, demand: 'high', trend: 'up' },
+                { name: 'React', count: 38, demand: 'high', trend: 'up' },
+                { name: 'AWS', count: 32, demand: 'high', trend: 'up' },
+                { name: 'Data Analysis', count: 28, demand: 'medium', trend: 'up' },
+                { name: 'Project Management', count: 25, demand: 'medium', trend: 'stable' },
+                { name: 'Digital Marketing', count: 22, demand: 'medium', trend: 'up' },
+                { name: 'Java', count: 18, demand: 'low', trend: 'down' },
+                { name: 'PHP', count: 12, demand: 'low', trend: 'down' }
+            ],
+            market_insights: [
+                {
+                    title: 'Remote Work Trend',
+                    description: '72% of job postings now offer remote or hybrid options, up from 45% last year.',
+                    icon: 'laptop-house',
+                    recommendation: 'Focus on remote-friendly job descriptions'
+                },
+                {
+                    title: 'Skill Gap Identified',
+                    description: 'High demand for cloud computing skills but only 15% of users have these skills.',
+                    icon: 'cloud',
+                    recommendation: 'Add cloud computing courses to curriculum'
+                },
+                {
+                    title: 'Application Rates',
+                    description: 'Jobs with salary transparency receive 3x more applications.',
+                    icon: 'money-bill-wave',
+                    recommendation: 'Encourage salary disclosure in job postings'
+                }
+            ],
+            recommendations: [
+                'Add more courses on cloud computing and DevOps',
+                'Create mentorship programs for high-demand skills',
+                'Improve job matching algorithm for remote positions',
+                'Partner with companies for exclusive return-to-work programs'
+            ],
+            gemini_analysis: 'Based on current market analysis, there is significant opportunity to focus on upskilling in cloud technologies and data science. The platform should consider adding more industry-specific mentorship programs and creating targeted learning paths for high-demand roles.'
+        };
+    }
+    
+    // Export analysis
+    const exportAnalysis = document.getElementById('exportAnalysis');
+    if (exportAnalysis) {
+        exportAnalysis.addEventListener('click', function() {
+            // Create a simple report
+            const report = {
+                title: 'Job Market Analysis Report',
+                date: new Date().toISOString(),
+                analysis: 'Analysis results would be exported here'
+            };
+            
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'job-analysis-report.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    }
+    
+    if (closeAnalysis) {
+        closeAnalysis.addEventListener('click', function() {
+            closeModal(analysisModal);
+        });
+    }
+    
+    // Filter functionality
+    const filters = ['statusFilter', 'typeFilter', 'dateFilter', 'searchFilter'];
+    filters.forEach(filterId => {
+        const filter = document.getElementById(filterId);
+        if (filter) {
+            filter.addEventListener('change', applyFilters);
+            if (filter.tagName === 'INPUT') {
+                filter.addEventListener('input', debounce(applyFilters, 300));
+            }
+        }
+    });
+    
+    function applyFilters() {
+        const filters = {
+            status: document.getElementById('statusFilter').value,
+            type: document.getElementById('typeFilter').value,
+            date: document.getElementById('dateFilter').value,
+            search: document.getElementById('searchFilter').value.toLowerCase()
+        };
+        
+        const rows = document.querySelectorAll('#jobsTable tbody tr');
+        
+        rows.forEach(row => {
+            let show = true;
+            
+            // Apply status filter
+            if (filters.status) {
+                const isActive = row.querySelector('.badge-success') !== null;
+                if (filters.status === 'active' && !isActive) show = false;
+                if (filters.status === 'inactive' && isActive) show = false;
+            }
+            
+            // Apply type filter
+            if (filters.type) {
+                const jobType = row.cells[3].textContent.toLowerCase();
+                if (!jobType.includes(filters.type)) show = false;
+            }
+            
+            // Apply search filter
+            if (filters.search) {
+                const jobTitle = row.cells[1].textContent.toLowerCase();
+                const company = row.cells[2].textContent.toLowerCase();
+                if (!jobTitle.includes(filters.search) && !company.includes(filters.search)) {
+                    show = false;
+                }
+            }
+            
+            row.style.display = show ? '' : 'none';
+        });
+    }
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // Select all checkbox
+    const selectAll = document.getElementById('selectAll');
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.job-select');
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

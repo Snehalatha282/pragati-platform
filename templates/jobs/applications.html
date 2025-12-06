@@ -1,0 +1,662 @@
+{% extends "templates/dashboard/base.html" %}
+
+{% block title %}My Applications - Pragati{% endblock %}
+
+{% block dashboard_content %}
+<div class="applications-header">
+    <h1>My Job Applications</h1>
+    <p>Track your job applications and their status</p>
+</div>
+
+<!-- Application Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-paper-plane"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ applications|length }}</h3>
+            <p>Total Applications</p>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-eye"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ applications|selectattr('status', 'equalto', 'reviewed')|list|length }}</h3>
+            <p>Under Review</p>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-comments"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ applications|selectattr('status', 'equalto', 'interviewed')|list|length }}</h3>
+            <p>Interview Stage</p>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div class="stat-content">
+            <h3>{{ applications|selectattr('status', 'equalto', 'hired')|list|length }}</h3>
+            <p>Successfully Hired</p>
+        </div>
+    </div>
+</div>
+
+<!-- Application Filters -->
+<div class="filter-tabs">
+    <button class="filter-tab active" data-filter="all">All Applications</button>
+    <button class="filter-tab" data-filter="applied">Applied</button>
+    <button class="filter-tab" data-filter="reviewed">Under Review</button>
+    <button class="filter-tab" data-filter="interviewed">Interview</button>
+    <button class="filter-tab" data-filter="hired">Hired</button>
+    <button class="filter-tab" data-filter="rejected">Rejected</button>
+</div>
+
+<!-- Applications List -->
+<div class="applications-list">
+    {% for application in applications %}
+    <div class="application-card" data-status="{{ application.status }}">
+        <div class="application-header">
+            <div class="application-info">
+                <h3>
+                    <a href="{{ url_for('jobs.job_detail', job_id=application.job.id) }}">
+                        {{ application.job.title }}
+                    </a>
+                </h3>
+                <p class="company">{{ application.job.company }}</p>
+                <div class="application-meta">
+                    <span><i class="fas fa-calendar"></i> Applied {{ application.applied_at.strftime('%b %d, %Y') }}</span>
+                    <span><i class="fas fa-clock"></i> {{ application.job.job_type }}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> {{ application.job.location }}</span>
+                </div>
+            </div>
+            
+            <div class="application-status">
+                <span class="status-badge status-{{ application.status }}">
+                    {{ application.status|title }}
+                </span>
+                {% if application.status == 'interviewed' %}
+                <button class="btn btn-outline btn-sm schedule-interview" data-id="{{ application.id }}">
+                    <i class="fas fa-calendar-plus"></i> Schedule
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="application-details">
+            <div class="detail-section">
+                <h4>Application Notes</h4>
+                <p>{{ application.cover_letter[:200] }}{% if application.cover_letter|length > 200 %}...{% endif %}</p>
+                {% if application.resume_url %}
+                <a href="{{ application.resume_url }}" class="btn btn-outline btn-sm" target="_blank">
+                    <i class="fas fa-download"></i> View Resume
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="detail-section">
+                <h4>Next Steps</h4>
+                <ul class="next-steps">
+                    {% if application.status == 'applied' %}
+                    <li><i class="fas fa-check"></i> Application submitted</li>
+                    <li><i class="fas fa-clock"></i> Awaiting review</li>
+                    <li><i class="fas fa-envelope"></i> Check email for updates</li>
+                    {% elif application.status == 'reviewed' %}
+                    <li><i class="fas fa-check"></i> Application reviewed</li>
+                    <li><i class="fas fa-comments"></i> Prepare for potential interview</li>
+                    <li><i class="fas fa-file-alt"></i> Update portfolio if needed</li>
+                    {% elif application.status == 'interviewed' %}
+                    <li><i class="fas fa-check"></i> Interview completed</li>
+                    <li><i class="fas fa-hourglass-half"></i> Awaiting decision</li>
+                    <li><i class="fas fa-envelope"></i> Send thank you note</li>
+                    {% elif application.status == 'hired' %}
+                    <li><i class="fas fa-check"></i> Congratulations! Offer received</li>
+                    <li><i class="fas fa-file-contract"></i> Review offer details</li>
+                    <li><i class="fas fa-calendar-check"></i> Plan start date</li>
+                    {% elif application.status == 'rejected' %}
+                    <li><i class="fas fa-times"></i> Application not selected</li>
+                    <li><i class="fas fa-redo"></i> Apply for similar positions</li>
+                    <li><i class="fas fa-comment"></i> Request feedback if possible</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="application-actions">
+            <button class="btn btn-outline btn-sm view-details" data-id="{{ application.id }}">
+                <i class="fas fa-eye"></i> View Details
+            </button>
+            <button class="btn btn-outline btn-sm withdraw-application" data-id="{{ application.id }}">
+                <i class="fas fa-times"></i> Withdraw
+            </button>
+            <button class="btn btn-outline btn-sm track-application" data-id="{{ application.id }}">
+                <i class="fas fa-chart-line"></i> Track
+            </button>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-file-alt"></i>
+        <h3>No applications yet</h3>
+        <p>Start applying to jobs to track your progress here</p>
+        <a href="{{ url_for('jobs.job_listings') }}" class="btn btn-primary">
+            <i class="fas fa-search"></i> Find Jobs
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Application Timeline Modal -->
+<div class="modal" id="timelineModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Application Timeline</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="timeline" id="applicationTimeline">
+                <!-- Timeline will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.applications-header {
+    margin-bottom: 2rem;
+}
+
+.applications-header h1 {
+    font-size: 2rem;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-tab {
+    padding: 0.5rem 1.5rem;
+    background: none;
+    border: 1px solid var(--gray-light);
+    border-radius: 50px;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.3s;
+}
+
+.filter-tab:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.filter-tab.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.applications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.application-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary-color);
+}
+
+.application-card[data-status="reviewed"] {
+    border-left-color: var(--warning-color);
+}
+
+.application-card[data-status="interviewed"] {
+    border-left-color: var(--info-color);
+}
+
+.application-card[data-status="hired"] {
+    border-left-color: var(--success-color);
+}
+
+.application-card[data-status="rejected"] {
+    border-left-color: var(--danger-color);
+}
+
+.application-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.application-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.application-info h3 a {
+    color: var(--dark-color);
+    text-decoration: none;
+}
+
+.application-info h3 a:hover {
+    color: var(--primary-color);
+}
+
+.company {
+    color: var(--primary-color);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.application-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--gray);
+    flex-wrap: wrap;
+}
+
+.application-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.application-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-applied {
+    background: rgba(138, 43, 226, 0.1);
+    color: var(--primary-color);
+}
+
+.status-reviewed {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+}
+
+.status-interviewed {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--accent-color);
+}
+
+.status-hired {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+}
+
+.status-rejected {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+}
+
+.application-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.detail-section h4 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--dark-color);
+}
+
+.detail-section p {
+    color: var(--gray-dark);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.next-steps {
+    list-style: none;
+    padding-left: 0;
+}
+
+.next-steps li {
+    margin-bottom: 0.5rem;
+    color: var(--gray-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.next-steps li i {
+    color: var(--success-color);
+}
+
+.application-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--gray-light);
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+}
+
+.empty-state p {
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gray-light);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    border: 2px solid white;
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.timeline-item.completed::before {
+    background: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.timeline-item.current::before {
+    background: var(--warning-color);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.timeline-content h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--dark-color);
+}
+
+.timeline-content p {
+    color: var(--gray);
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-date {
+    font-size: 0.75rem;
+    color: var(--gray);
+}
+
+@media (max-width: 768px) {
+    .filter-tabs {
+        justify-content: center;
+    }
+    
+    .application-header {
+        flex-direction: column;
+    }
+    
+    .application-status {
+        align-items: flex-start;
+    }
+    
+    .application-details {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter applications
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const applicationCards = document.querySelectorAll('.application-card');
+    
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            
+            // Update active tab
+            filterTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter cards
+            applicationCards.forEach(card => {
+                if (filter === 'all' || card.getAttribute('data-status') === filter) {
+                    card.style.display = 'block';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 10);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+    });
+    
+    // View timeline
+    const viewDetailsButtons = document.querySelectorAll('.view-details');
+    const timelineModal = document.getElementById('timelineModal');
+    const timelineContent = document.getElementById('applicationTimeline');
+    
+    viewDetailsButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const applicationId = this.getAttribute('data-id');
+            loadTimeline(applicationId);
+            timelineModal.style.display = 'flex';
+        });
+    });
+    
+    function loadTimeline(applicationId) {
+        // Mock timeline data - in production, fetch from API
+        const timelineData = [
+            {
+                title: 'Application Submitted',
+                description: 'Your application was successfully submitted',
+                date: '2024-01-15',
+                status: 'completed'
+            },
+            {
+                title: 'Application Reviewed',
+                description: 'HR team has reviewed your application',
+                date: '2024-01-18',
+                status: 'completed'
+            },
+            {
+                title: 'Technical Assessment',
+                description: 'Complete the technical assessment',
+                date: '2024-01-20',
+                status: 'current'
+            },
+            {
+                title: 'Interview Scheduled',
+                description: 'Awaiting interview scheduling',
+                date: 'Expected: 2024-01-25',
+                status: 'pending'
+            },
+            {
+                title: 'Final Decision',
+                description: 'Company will make final hiring decision',
+                date: 'Expected: 2024-01-30',
+                status: 'pending'
+            }
+        ];
+        
+        let html = '';
+        timelineData.forEach(item => {
+            html += `
+                <div class="timeline-item ${item.status}">
+                    <div class="timeline-content">
+                        <h4>${item.title}</h4>
+                        <p>${item.description}</p>
+                        <span class="timeline-date">${item.date}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        timelineContent.innerHTML = html;
+    }
+    
+    // Withdraw application
+    const withdrawButtons = document.querySelectorAll('.withdraw-application');
+    withdrawButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const applicationId = this.getAttribute('data-id');
+            
+            if (confirm('Are you sure you want to withdraw this application?')) {
+                fetch(`/jobs/applications/${applicationId}/withdraw`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const card = this.closest('.application-card');
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(10px)';
+                        setTimeout(() => {
+                            card.remove();
+                            showNotification('Application withdrawn successfully', 'success');
+                        }, 300);
+                    }
+                });
+            }
+        });
+    });
+    
+    // Close modal
+    document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            modal.style.display = 'none';
+        });
+    });
+    
+    // Close modal on outside click
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+    
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: ${type === 'success' ? '#10b981' : '#ef4444'};
+            color: white;
+            border-radius: var(--radius);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+});
+</script>
+{% endblock %}

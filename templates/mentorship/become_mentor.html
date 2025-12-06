@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block title %}Become a Mentor - Pragati{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header bg-gradient-primary text-white text-center py-4">
+                <h2 class="mb-0"><i class="fas fa-chalkboard-teacher mr-2"></i>Become a Mentor</h2>
+                <p class="mb-0 mt-2 text-white-50">Share your expertise and guide others back to their careers.</p>
+            </div>
+
+            <div class="card-body p-5">
+                {% if is_pending %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-clock text-warning fa-4x"></i>
+                    </div>
+                    <h3>Verification Pending</h3>
+                    <p class="lead text-muted">We have sent a verification email to your company.</p>
+                    <p>Once verified, your profile will be listed in our mentor directory.</p>
+                    <div class="alert alert-warning mt-4">
+                        <small>Check your email (or the demo logs) for the verification link.</small>
+                    </div>
+                    <a href="{{ url_for('dashboard.home') }}" class="btn btn-outline-primary mt-3">Return to
+                        Dashboard</a>
+                </div>
+                {% else %}
+                <form method="POST" action="{{ url_for('mentorship.become_mentor') }}">
+
+                    <h5 class="text-primary mb-4 border-bottom pb-2">Professional Profile</h5>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="company" class="font-weight-bold">Current Company</label>
+                            <input type="text" class="form-control" id="company" name="company" required
+                                placeholder="e.g. Google, TCS, Startup Inc.">
+                            <small class="form-text text-muted">We will send a verification email to authenticate
+                                this.</small>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="job_title" class="font-weight-bold">Job Title</label>
+                            <input type="text" class="form-control" id="job_title" name="job_title" required
+                                placeholder="e.g. Senior Software Engineer">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience_years" class="font-weight-bold">Years of Experience</label>
+                        <input type="number" class="form-control" id="experience_years" name="experience_years" required
+                            min="1" max="50" placeholder="Total years in industry">
+                    </div>
+
+                    <h5 class="text-primary mb-4 mt-4 border-bottom pb-2">Mentorship Details</h5>
+
+                    <div class="form-group">
+                        <label for="skills" class="font-weight-bold">Skills You Can Teach</label>
+                        <input type="text" class="form-control" id="skills" name="skills" required
+                            placeholder="e.g. Python, React, Career Guidance, Interview Prep">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio" class="font-weight-bold">Bio / Mentorship Philosophy</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="4" required
+                            placeholder="Tell us about yourself and how you can help mentees..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Verification Process:</strong> Upon submission, we will send an email to your registered
+                        company or verify your details manually. A "Verified" badge increases trust with mentees.
+                    </div>
+
+                    <div class="form-group mt-5 text-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
+                            Submit Application & Verify
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+</style>
+{% endblock %}

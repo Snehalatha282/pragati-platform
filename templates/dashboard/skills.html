@@ -1,514 +1,1084 @@
 {% extends "layout.html" %}
 
-
-{% block title %}Skills Development - Pragati{% endblock %}
+{% block title %}Skills & Growth - Pragati{% endblock %}
 
 {% block content %}
 
-<div class="skills-header">
-    <h1>Skills Development</h1>
-    <p>Assess your current skills, identify gaps, and build your personalized learning path</p>
+<!-- Hero Section -->
+<div class="skills-hero">
+    <div class="hero-content">
+        <h1>Unlock Your Potential</h1>
+        <p>Discover personalized learning paths and bridge your skill gaps with AI-curated recommendations.</p>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-val">{{ user_courses|length }}</span>
+                <span class="stat-label">Active Courses</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">{{ assessments|length }}</span>
+                <span class="stat-label">Assessments</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-decoration">
+        <i class="fas fa-rocket"></i>
+    </div>
 </div>
 
 <div class="skills-container">
-    <!-- Skill Assessment Section -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">Skill Assessment</h2>
-            <p class="card-subtitle">Complete this assessment to get personalized recommendations</p>
-        </div>
-        <div class="card-body">
-            <div class="assessment-progress">
-                <div class="progress">
-                    <div class="progress-bar" style="width: 40%"></div>
+
+    <!-- Assessment & Gaps Grid -->
+    <div class="dashboard-grid">
+        <!-- Skill Assessment Card -->
+        <div class="modern-card assessment-card">
+            <div class="card-header-modern">
+                <div>
+                    <h2>Skill Health</h2>
+                    <p>Track your technical and soft skill proficiency</p>
                 </div>
-                <span class="progress-text">40% Complete</span>
+                <button class="btn-icon" title="Take new assessment"><i class="fas fa-plus"></i></button>
             </div>
-            
-            <div class="assessment-categories">
-                {% for category in skill_categories %}
-                <div class="category-card">
-                    <div class="category-header">
-                        <h3>{{ category.name }}</h3>
-                        <span class="category-level">{{ category.level }}%</span>
+            <div class="card-body">
+                <div class="skill-bars">
+                    {% for category in skill_categories %}
+                    <div class="skill-row">
+                        <div class="skill-info">
+                            <span class="skill-name">{{ category.name }}</span>
+                            <span class="skill-pct">{{ category.level }}%</span>
+                        </div>
+                        <div class="progress-modern">
+                            <div class="progress-fill"
+                                style="width: {{ category.level }}%; background: {{ category.color }}"></div>
+                        </div>
                     </div>
-                    <div class="progress">
-                        <div class="progress-bar" style="width: {{ category.level }}%; background-color: {{ category.color }}"></div>
-                    </div>
-                    <div class="category-actions">
-                        <a href="#" class="btn btn-outline btn-sm">Take Assessment</a>
-                        <a href="#" class="btn btn-link">View Details</a>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-            
-            <div class="text-center mt-3">
-                <a href="#" class="btn btn-primary">
-                    <i class="fas fa-clipboard-check"></i> Start Full Assessment
-                </a>
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-block" onclick="startAIQuiz('technical')">
+                        <i class="fas fa-magic"></i> AI Assessment
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Recommended Courses -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">Recommended Courses</h2>
-            <p class="card-subtitle">Based on your assessment results</p>
-        </div>
-        <div class="card-body">
-            <div class="courses-grid">
-                <div class="course-card">
-                    <div class="course-badge">Recommended</div>
-                    <div class="course-icon">
-                        <i class="fab fa-python"></i>
-                    </div>
-                    <h3>Python for Data Science</h3>
-                    <p class="course-description">Master Python programming for data analysis, visualization, and machine learning.</p>
-                    <div class="course-meta">
-                        <span><i class="fas fa-clock"></i> 20 hours</span>
-                        <span><i class="fas fa-signal"></i> Beginner</span>
-                    </div>
-                    <div class="course-skills">
-                        <span class="skill-tag">Python</span>
-                        <span class="skill-tag">Pandas</span>
-                        <span class="skill-tag">NumPy</span>
-                    </div>
-                    <a href="#" class="btn btn-primary btn-block mt-2">Enroll Now</a>
+
+        <!-- Skill Gaps Card -->
+        <div class="modern-card gaps-card">
+            <div class="card-header-modern">
+                <div>
+                    <h2>Priority Focus</h2>
+                    <p>Critical skills for your target role</p>
                 </div>
-                
-                <div class="course-card">
-                    <div class="course-badge">Popular</div>
-                    <div class="course-icon">
-                        <i class="fas fa-code"></i>
+            </div>
+            <div class="card-body">
+                <div class="gaps-list">
+                    <div class="gap-item priority-high">
+                        <div class="gap-icon"><i class="fab fa-python"></i></div>
+                        <div class="gap-details">
+                            <h3>Python</h3>
+                            <span class="tag tag-high">High Demand</span>
+                        </div>
+                        <button class="btn-sm-outline">Explore</button>
                     </div>
-                    <h3>Web Development Fundamentals</h3>
-                    <p class="course-description">Learn HTML, CSS, and JavaScript to build modern, responsive websites.</p>
-                    <div class="course-meta">
-                        <span><i class="fas fa-clock"></i> 30 hours</span>
-                        <span><i class="fas fa-signal"></i> Beginner</span>
+                    <div class="gap-item priority-med">
+                        <div class="gap-icon"><i class="fas fa-cloud"></i></div>
+                        <div class="gap-details">
+                            <h3>Cloud Basics</h3>
+                            <span class="tag tag-med">Medium Priority</span>
+                        </div>
+                        <button class="btn-sm-outline">Explore</button>
                     </div>
-                    <div class="course-skills">
-                        <span class="skill-tag">HTML</span>
-                        <span class="skill-tag">CSS</span>
-                        <span class="skill-tag">JavaScript</span>
+                    <div class="gap-item priority-med">
+                        <div class="gap-icon"><i class="fas fa-chart-bar"></i></div>
+                        <div class="gap-details">
+                            <h3>Data Viz</h3>
+                            <span class="tag tag-med">Medium Priority</span>
+                        </div>
+                        <button class="btn-sm-outline">Explore</button>
                     </div>
-                    <a href="#" class="btn btn-outline btn-block mt-2">Preview Course</a>
-                </div>
-                
-                <div class="course-card">
-                    <div class="course-icon">
-                        <i class="fas fa-bullhorn"></i>
-                    </div>
-                    <h3>Digital Marketing Strategy</h3>
-                    <p class="course-description">Develop effective digital marketing campaigns across multiple channels.</p>
-                    <div class="course-meta">
-                        <span><i class="fas fa-clock"></i> 15 hours</span>
-                        <span><i class="fas fa-signal"></i> Intermediate</span>
-                    </div>
-                    <div class="course-skills">
-                        <span class="skill-tag">SEO</span>
-                        <span class="skill-tag">Social Media</span>
-                        <span class="skill-tag">Analytics</span>
-                    </div>
-                    <a href="#" class="btn btn-outline btn-block mt-2">View Details</a>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Your Learning Progress -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">Your Learning Progress</h2>
+
+    <!-- Recommendations Section -->
+    <div class="recommendations-section" id="courses-section">
+        <div class="section-header">
+            <div>
+                <h2>Recommended For You</h2>
+                <div class="subtitle-badge">
+                    <span>Based on: </span>
+                    <span id="current-skill-gaps" class="highlight-text">Analysis...</span>
+                </div>
+            </div>
+            <div class="filter-controls">
+                <button class="filter-btn active" onclick="sortCourses('rating')">
+                    <i class="fas fa-star"></i> Top Rated
+                </button>
+                <button class="filter-btn" onclick="sortCourses('price')">
+                    <i class="fas fa-tag"></i> Best Value
+                </button>
+                <button class="filter-btn refresh-btn" onclick="loadRecommendedCourses()"
+                    title="Refresh Recommendations">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
         </div>
-        <div class="card-body">
-            {% for user_course in user_courses %}
-            <div class="learning-item">
-                <div class="learning-info">
-                    <h4>{{ user_course.course.title }}</h4>
-                    <p>Enrolled on {{ user_course.enrolled_at.strftime('%b %d, %Y') }}</p>
-                </div>
-                <div class="learning-progress">
-                    <div class="progress">
-                        <div class="progress-bar" style="width: {{ user_course.progress }}%"></div>
-                    </div>
-                    <span class="progress-percent">{{ user_course.progress }}%</span>
-                </div>
-                <div class="learning-actions">
-                    {% if user_course.progress < 100 %}
-                    <a href="#" class="btn btn-primary btn-sm">Continue</a>
-                    {% else %}
-                    <span class="badge badge-success">Completed</span>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-            
-            {% if not user_courses %}
-            <div class="empty-state">
-                <i class="fas fa-graduation-cap"></i>
-                <h4>No courses enrolled yet</h4>
-                <p>Start your learning journey by enrolling in recommended courses</p>
-                <a href="#" class="btn btn-primary">Browse Courses</a>
-            </div>
-            {% endif %}
+
+        <!-- Loading State -->
+        <div id="courses-loading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Curating the best courses for you...</p>
+        </div>
+
+        <!-- Course Grid -->
+        <div class="courses-grid-modern" id="courses-grid">
+            <!-- Dynamic Content -->
         </div>
     </div>
-    
-    <!-- Skill Gap Analysis -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">Skill Gap Analysis</h2>
-            <p class="card-subtitle">Identified areas for improvement</p>
+</div>
+
+<!-- Quiz Modal -->
+<div id="quizModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content quiz-modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-brain"></i> AI Skill Quiz</h3>
+            <button class="close-modal" onclick="closeQuizModal()">&times;</button>
         </div>
-        <div class="card-body">
-            <div class="gap-analysis">
-                <div class="gap-item">
-                    <div class="gap-info">
-                        <h4>Cloud Computing</h4>
-                        <p>High demand in current job market</p>
-                    </div>
-                    <div class="gap-stats">
-                        <span class="gap-level">Beginner</span>
-                        <span class="gap-demand">High Demand</span>
-                    </div>
-                    <a href="#" class="btn btn-outline btn-sm">Explore Courses</a>
+        <div class="modal-body">
+            <!-- Loading State -->
+            <div id="quiz-loading" class="text-center py-5">
+                <div class="spinner"></div>
+                <p>Generating your personalized quiz...</p>
+            </div>
+
+            <!-- Quiz Container -->
+            <div id="quiz-container" style="display: none;">
+                <div class="quiz-progress-bar">
+                    <div class="progress-fill" id="quiz-progress" style="width: 0%"></div>
                 </div>
-                
-                <div class="gap-item">
-                    <div class="gap-info">
-                        <h4>Data Visualization</h4>
-                        <p>Essential for data-driven roles</p>
+                <div class="quiz-question-container">
+                    <span class="question-badge" id="question-topic">Topic</span>
+                    <h4 id="question-text">Question goes here?</h4>
+                    <div class="quiz-options" id="quiz-options">
+                        <!-- Options injected here -->
                     </div>
-                    <div class="gap-stats">
-                        <span class="gap-level">Intermediate</span>
-                        <span class="gap-demand">Medium Demand</span>
-                    </div>
-                    <a href="#" class="btn btn-outline btn-sm">Explore Courses</a>
                 </div>
-                
-                <div class="gap-item">
-                    <div class="gap-info">
-                        <h4>Agile Methodology</h4>
-                        <p>Industry standard for project management</p>
-                    </div>
-                    <div class="gap-stats">
-                        <span class="gap-level">Beginner</span>
-                        <span class="gap-demand">High Demand</span>
-                    </div>
-                    <a href="#" class="btn btn-outline btn-sm">Explore Courses</a>
+                <div class="quiz-footer">
+                    <span id="question-count">1 of 5</span>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="next-btn" disabled>Next</button>
                 </div>
+            </div>
+
+            <!-- Quiz Results -->
+            <div id="quiz-results" style="display: none; text-align: center;">
+                <div class="score-circle">
+                    <span id="final-score">0</span>
+                    <span class="total">/5</span>
+                </div>
+                <h3>Quiz Completed!</h3>
+                <p id="result-message">Great job! You've shown strong skills.</p>
+                <button class="btn btn-primary mt-3" onclick="closeQuizModal(); loadRecommendedCourses();">
+                    View Recommended Courses
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_css %}
 <style>
-.skills-header {
-    margin-bottom: 2rem;
-}
-
-.skills-header h1 {
-    font-size: 2rem;
-    color: var(--dark-color);
-    margin-bottom: 0.5rem;
-}
-
-.skills-header p {
-    color: var(--gray-dark);
-}
-
-.assessment-progress {
-    margin-bottom: 2rem;
-}
-
-.progress-text {
-    display: block;
-    text-align: center;
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--gray);
-}
-
-.assessment-categories {
-    display: grid;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.category-card {
-    padding: 1rem;
-    border: 1px solid var(--gray-light);
-    border-radius: var(--radius);
-    transition: all 0.3s;
-}
-
-.category-card:hover {
-    border-color: var(--primary-light);
-    box-shadow: var(--shadow-sm);
-}
-
-.category-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-}
-
-.category-header h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.category-level {
-    font-weight: 600;
-    color: var(--primary-color);
-}
-
-.category-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.btn-link {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-size: 0.875rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-
-.btn-link:hover {
-    text-decoration: underline;
-}
-
-.courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.course-card {
-    padding: 1.5rem;
-    border: 1px solid var(--gray-light);
-    border-radius: var(--radius);
-    transition: all 0.3s;
-}
-
-.course-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
-
-.course-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    background: var(--primary-color);
-    color: white;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.course-icon {
-    width: 3rem;
-    height: 3rem;
-    background: linear-gradient(135deg, var(--primary-light), var(--secondary-color));
-    border-radius: var(--radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1rem;
-    color: white;
-    font-size: 1.5rem;
-}
-
-.course-card h3 {
-    font-size: 1.125rem;
-    margin-bottom: 0.5rem;
-    color: var(--dark-color);
-}
-
-.course-description {
-    color: var(--gray-dark);
-    font-size: 0.875rem;
-    margin-bottom: 1rem;
-    line-height: 1.5;
-}
-
-.course-meta {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
-    color: var(--gray);
-}
-
-.course-meta span {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.course-skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.skill-tag {
-    padding: 0.25rem 0.75rem;
-    background: var(--light-color);
-    color: var(--dark-color);
-    border-radius: 50px;
-    font-size: 0.75rem;
-}
-
-.learning-item {
-    display: grid;
-    grid-template-columns: 2fr 3fr 1fr;
-    gap: 1rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--gray-light);
-    align-items: center;
-}
-
-.learning-item:last-child {
-    border-bottom: none;
-}
-
-.learning-info h4 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-    color: var(--dark-color);
-}
-
-.learning-info p {
-    font-size: 0.875rem;
-    color: var(--gray);
-}
-
-.learning-progress {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.learning-progress .progress {
-    flex: 1;
-}
-
-.progress-percent {
-    min-width: 3rem;
-    text-align: right;
-    font-weight: 600;
-    color: var(--primary-color);
-}
-
-.gap-analysis {
-    display: grid;
-    gap: 1rem;
-}
-
-.gap-item {
-    display: grid;
-    grid-template-columns: 2fr 1fr auto;
-    gap: 1rem;
-    padding: 1rem;
-    border: 1px solid var(--gray-light);
-    border-radius: var(--radius);
-    align-items: center;
-}
-
-.gap-info h4 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-    color: var(--dark-color);
-}
-
-.gap-info p {
-    font-size: 0.875rem;
-    color: var(--gray);
-}
-
-.gap-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.gap-level, .gap-demand {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-align: center;
-}
-
-.gap-level {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning-color);
-}
-
-.gap-demand {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger-color);
-}
-
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-}
-
-.empty-state i {
-    font-size: 3rem;
-    color: var(--gray-light);
-    margin-bottom: 1rem;
-}
-
-.empty-state h4 {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
-    color: var(--dark-color);
-}
-
-.empty-state p {
-    color: var(--gray);
-    margin-bottom: 1.5rem;
-}
-
-.mt-2 { margin-top: 0.5rem; }
-.mt-3 { margin-top: 1rem; }
-
-@media (max-width: 768px) {
-    .courses-grid {
-        grid-template-columns: 1fr;
+    :root {
+        --card-bg: #ffffff;
+        --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        --hover-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        --radius-lg: 20px;
+        --radius-md: 12px;
     }
-    
-    .learning-item {
-        grid-template-columns: 1fr;
+
+    body {
+        background-color: #f8f9fa;
+    }
+
+    /* Hero Section */
+    .skills-hero {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: var(--radius-lg);
+        margin: 1rem 0 3rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(118, 75, 162, 0.2);
+    }
+
+    .hero-content {
+        z-index: 2;
+        max-width: 600px;
+    }
+
+    .skills-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .skills-hero p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-val {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    .hero-decoration {
+        font-size: 10rem;
+        opacity: 0.1;
+        position: absolute;
+        right: -2rem;
+        bottom: -3rem;
+        transform: rotate(-15deg);
+    }
+
+    /* Modern Grid */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .modern-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header-modern h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0;
+    }
+
+    .card-header-modern p {
+        font-size: 0.875rem;
+        color: #718096;
+        margin-top: 0.25rem;
+    }
+
+    /* Skill Bars */
+    .skill-row {
+        margin-bottom: 1rem;
+    }
+
+    .skill-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+    }
+
+    .progress-modern {
+        height: 8px;
+        background: #edf2f7;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s ease-in-out;
+    }
+
+    /* Gaps List */
+    .gaps-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .gap-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f7fafc;
+        border-radius: var(--radius-md);
+        transition: transform 0.2s;
+    }
+
+    .gap-item:hover {
+        transform: translateX(5px);
+        background: #edf2f7;
+    }
+
+    .gap-icon {
+        width: 40px;
+        height: 40px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4a5568;
+        margin-right: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .gap-details h3 {
+        font-size: 0.95rem;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .tag {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 100px;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .tag-high {
+        color: #e53e3e;
+        background: rgba(229, 62, 62, 0.1);
+    }
+
+    .tag-med {
+        color: #d69e2e;
+        background: rgba(214, 158, 46, 0.1);
+    }
+
+    .btn-sm-outline {
+        margin-left: auto;
+        border: 1px solid #cbd5e0;
+        background: transparent;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        color: #718096;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-sm-outline:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    /* Recommendations Section */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        color: #2d3748;
+        margin: 0;
+    }
+
+    .subtitle-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #718096;
+        margin-top: 0.5rem;
+    }
+
+    .highlight-text {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .filter-controls {
+        background: white;
+        padding: 0.25rem;
+        border-radius: 30px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        display: flex;
+    }
+
+    .filter-btn {
+        border: none;
+        background: transparent;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.875rem;
+        color: #718096;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
     }
-    
-    .gap-item {
-        grid-template-columns: 1fr;
-        text-align: center;
+
+    .filter-btn.active {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
     }
-    
-    .gap-stats {
-        flex-direction: row;
+
+    .filter-btn:hover:not(.active) {
+        color: #4a5568;
+    }
+
+    .refresh-btn {
+        margin-left: 0.5rem;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    /* Course Grid Modern */
+    .courses-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .course-card-modern {
+        background: white;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        position: relative;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: var(--card-shadow);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .course-card-modern:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--hover-shadow);
+    }
+
+    .course-top {
+        height: 120px;
+        background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+        position: relative;
+        display: flex;
+        align-items: center;
         justify-content: center;
     }
-}
+
+    .course-platform-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #4a5568;
+        backdrop-filter: blur(4px);
+    }
+
+    .course-icon-large {
+        font-size: 3rem;
+        color: #a0aec0;
+    }
+
+    .course-content {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .price-tag {
+        position: absolute;
+        top: 1rem;
+        left: 0;
+        padding: 0.25rem 1rem 0.25rem 0.75rem;
+        background: var(--primary-gradient);
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 0 20px 20px 0;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .price-free {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .course-title {
+        font-size: 1.1rem;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        line-clamp: 2;
+    }
+
+    .stars {
+        color: #ecc94b;
+        font-size: 0.9rem;
+    }
+
+    .rating-val {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+
+    .course-footer {
+        padding-top: 1rem;
+        margin-top: auto;
+        border-top: 1px solid #f7fafc;
+    }
+
+    .btn-course {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: var(--radius-md);
+        border: none;
+        background: #edf2f7;
+        color: #4a5568;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+    }
+
+    .btn-course:hover {
+        background: #e2e8f0;
+        color: #2d3748;
+    }
+
+    .loading-state {
+        text-align: center;
+        padding: 4rem;
+        display: none;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .quiz-modal-content {
+        background: white;
+        width: 90%;
+        max-width: 600px;
+        border-radius: var(--radius-lg);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #edf2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8fafc;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        color: #2d3748;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #a0aec0;
+    }
+
+    .close-modal:hover {
+        color: #e53e3e;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    /* Quiz Styles */
+    .quiz-progress-bar {
+        height: 6px;
+        background: #edf2f7;
+        border-radius: 3px;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .quiz-progress-bar .progress-fill {
+        background: var(--primary-gradient);
+        height: 100%;
+        transition: width 0.3s;
+    }
+
+    .question-badge {
+        background: #ebf4ff;
+        color: #5a67d8;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    #question-text {
+        font-size: 1.25rem;
+        color: #2d3748;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+    }
+
+    .quiz-options {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .option-btn {
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        background: white;
+        text-align: left;
+        cursor: pointer;
+        font-weight: 500;
+        color: #4a5568;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .option-btn:hover {
+        border-color: #cbd5e0;
+        background: #f7fafc;
+    }
+
+    .option-btn.selected {
+        border-color: #667eea;
+        background: #ebf4ff;
+        color: #5a67d8;
+    }
+
+    .option-btn.correct {
+        border-color: #48bb78;
+        background: #f0fff4;
+        color: #2f855a;
+    }
+
+    .option-btn.wrong {
+        border-color: #f56565;
+        background: #fff5f5;
+        color: #c53030;
+    }
+
+    .quiz-footer {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #edf2f7;
+        padding-top: 1.5rem;
+    }
+
+    .score-circle {
+        width: 120px;
+        height: 120px;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .score-circle .total {
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+        .skills-hero {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .hero-stats {
+            justify-content: center;
+        }
+
+        .card-header-modern {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Quiz Logic
+    let quizQuestions = [];
+    let currentQuestionIndex = 0;
+    let userScore = 0;
+    let selectedOptionIndex = null;
+
+    function startAIQuiz(type = 'technical') {
+        const modal = document.getElementById('quizModal');
+        const loading = document.getElementById('quiz-loading');
+        const container = document.getElementById('quiz-container');
+        const results = document.getElementById('quiz-results');
+
+        if (!modal) return;
+
+        modal.style.display = 'flex';
+        loading.style.display = 'block';
+        container.style.display = 'none';
+        results.style.display = 'none';
+
+        // Reset state
+        currentQuestionIndex = 0;
+        userScore = 0;
+        quizQuestions = [];
+
+        // Fetch Quiz
+        fetch('/dashboard/api/generate-quiz', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: type })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.quiz.questions) {
+                    quizQuestions = data.quiz.questions;
+                    loading.style.display = 'none';
+                    container.style.display = 'block';
+                    renderQuestion();
+                } else {
+                    alert('Failed to generate quiz. Please try again.');
+                    closeQuizModal();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error connecting to AI service.');
+                closeQuizModal();
+            });
+    }
+
+    function closeQuizModal() {
+        const modal = document.getElementById('quizModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function renderQuestion() {
+        const question = quizQuestions[currentQuestionIndex];
+        const topicEl = document.getElementById('question-topic');
+        const textEl = document.getElementById('question-text');
+
+        if (topicEl) topicEl.textContent = question.topic || 'General';
+        if (textEl) textEl.textContent = question.question;
+
+        document.getElementById('question-count').textContent = `${currentQuestionIndex + 1} of ${quizQuestions.length}`;
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.disabled = true;
+        nextBtn.textContent = currentQuestionIndex === quizQuestions.length - 1 ? 'Finish' : 'Next';
+
+        // Update Progress
+        const progress = ((currentQuestionIndex) / quizQuestions.length) * 100;
+        document.getElementById('quiz-progress').style.width = `${progress}%`;
+
+        // Render Options
+        const optionsHtml = question.options.map((opt, idx) => `
+            <button class="option-btn" onclick="selectOption(${idx})" id="opt-${idx}">
+                ${opt}
+            </button>
+        `).join('');
+        document.getElementById('quiz-options').innerHTML = optionsHtml;
+
+        selectedOptionIndex = null;
+    }
+
+    function selectOption(index) {
+        if (selectedOptionIndex !== null) return; // Prevent re-selection
+        selectedOptionIndex = index;
+
+        const question = quizQuestions[currentQuestionIndex];
+        const correctIndex = question.correct_answer;
+
+        // Highlight selected
+        const selectedBtn = document.getElementById(`opt-${index}`);
+        const correctBtn = document.getElementById(`opt-${correctIndex}`);
+
+        if (index === correctIndex) {
+            selectedBtn.classList.add('correct');
+            userScore++;
+        } else {
+            selectedBtn.classList.add('wrong');
+            if (correctBtn) correctBtn.classList.add('correct'); // Show correct answer
+        }
+
+        // Enable Next Button
+        document.getElementById('next-btn').disabled = false;
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizQuestions.length) {
+            renderQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('quiz-results').style.display = 'block';
+        document.getElementById('final-score').textContent = userScore;
+
+        const percentage = (userScore / quizQuestions.length) * 100;
+        let msg = "Keep learning! You're getting there.";
+        if (percentage >= 80) msg = "Excellent Work! You've mastered these skills.";
+        else if (percentage >= 60) msg = "Good job! A bit more practice will help.";
+
+        document.getElementById('result-message').textContent = msg;
+    }
+
+    // Course Recommendation Logic
+    let currentCourses = [];
+    let sortMode = 'rating'; // 'rating' or 'price'
+
+    async function loadRecommendedCourses(skillGaps = []) {
+        const grid = document.getElementById('courses-grid');
+        const loading = document.getElementById('courses-loading');
+        const gapsSpan = document.getElementById('current-skill-gaps');
+
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        if (loading) loading.style.display = 'block';
+
+        try {
+            const response = await fetch('/dashboard/api/recommend-courses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    skill_gaps: skillGaps
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                currentCourses = data.courses;
+                if (gapsSpan) {
+                    if (skillGaps.length > 0) {
+                        gapsSpan.textContent = skillGaps.join(', ');
+                    } else {
+                        gapsSpan.textContent = "General Improvement";
+                    }
+                }
+                renderCourses();
+            } else {
+                grid.innerHTML = `<div class="col-12 text-center text-danger">Failed to load courses: ${data.error}</div>`;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            grid.innerHTML = `<div class="col-12 text-center text-danger">Error loading courses</div>`;
+        } finally {
+            if (loading) loading.style.display = 'none';
+        }
+    }
+
+    function sortCourses(mode) {
+        if (!currentCourses.length) return;
+
+        sortMode = mode;
+
+        // Update buttons
+        const buttons = document.querySelectorAll('.filter-controls .filter-btn');
+        buttons.forEach(btn => {
+            if (btn.textContent.toLowerCase().includes(mode === 'rating' ? 'top' : 'value')) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        if (mode === 'rating') {
+            // Sort by rating desc
+            currentCourses.sort((a, b) => b.rating - a.rating);
+        } else {
+            // Sort by price value asc (0 is free)
+            currentCourses.sort((a, b) => a.price_value - b.price_value);
+        }
+
+        renderCourses();
+    }
+
+    function renderCourses() {
+        const grid = document.getElementById('courses-grid');
+        if (!grid) return;
+
+        if (currentCourses.length === 0) {
+            grid.innerHTML = `
+    <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+        <p>No courses found. Try refreshing.</p>
+    </div>`;
+            return;
+        }
+
+        grid.innerHTML = currentCourses.map(course => {
+            // Determine gradients or icons based on platform
+            let iconClass = 'fa-laptop';
+            if (course.platform && course.platform.toLowerCase().includes('udemy')) iconClass = 'fa-u';  // mock
+            else if (course.platform && course.platform.toLowerCase().includes('coursera')) iconClass = 'fa-copyright';
+            else if (course.platform && course.platform.toLowerCase().includes('google')) iconClass = 'fa-google';
+            else if (course.platform && course.platform.toLowerCase().includes('youtube')) iconClass = 'fa-youtube';
+
+            const isFree = course.price_value === 0;
+            const priceLabel = isFree ? 'Free' : course.price;
+            const priceClass = isFree ? 'price-free' : '';
+
+            return `
+<div class="course-card-modern">
+    <div class="price-tag ${priceClass}">
+        ${priceLabel}
+    </div>
+    <div class="course-top">
+        <div class="course-platform-badge">${course.platform}</div>
+        <i class="fas ${iconClass} course-icon-large"></i>
+    </div>
+    <div class="course-content">
+        <h3 class="course-title" title="${course.title}">${course.title}</h3>
+        <div class="course-rating">
+            <div class="stars">
+                ${getStarRating(course.rating)}
+            </div>
+            <span class="rating-val">${course.rating}</span>
+        </div>
+        <div class="course-footer">
+            <a href="${course.url}" target="_blank" class="btn-course">
+                View Course <i class="fas fa-external-link-alt ml-1"></i>
+            </a>
+        </div>
+    </div>
+</div>
+`;
+        }).join('');
+    }
+
+    function getStarRating(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) stars += '<i class="fas fa-star"></i>';
+            else if (i - 0.5 <= rating) stars += '<i class="fas fa-star-half-alt"></i>';
+            else stars += '<i class="far fa-star"></i>';
+        }
+        return stars;
+    }
+
+    // Auto-load on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadRecommendedCourses();
+    });
+</script>
 {% endblock %}

@@ -179,3 +179,70 @@ def generate_learning_path():
             'success': False,
             'error': str(e)
         }), 500
+
+@dashboard_bp.route('/api/recommend-courses', methods=['POST'])
+@login_required
+def recommend_courses():
+    """Generate course recommendations based on skill gaps"""
+    try:
+        data = request.json
+        skill_gaps = data.get('skill_gaps', [])
+        
+        # If no explicit skill gaps provided, try to find from latest assessment
+        if not skill_gaps:
+             latest_assessment = Assessment.query.filter_by(
+                user_id=current_user.id, 
+                assessment_type='technical'
+            ).order_by(Assessment.completed_at.desc()).first()
+             
+             if latest_assessment:
+                 try:
+                     result = json.loads(latest_assessment.result_data)
+                     skill_gaps = result.get('skill_gaps', [])
+                 except:
+                     pass
+        
+        # Default skills if still empty
+        if not skill_gaps:
+            skill_gaps = ['General Python', 'Web Development']
+
+        assessor = GeminiAssessment()
+        courses = assessor.get_course_recommendations(skill_gaps)
+        
+        return jsonify({
+            'success': True,
+            'courses': courses
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@dashboard_bp.route('/api/generate-quiz', methods=['POST'])
+@login_required
+def generate_quiz():
+    """Generate a quiz based on user skills"""
+    try:
+        data = request.json
+        assessment_type = data.get('type', 'technical')
+        
+        # Get user skills or use default
+        skills = current_user.skills or "General Python, Web Development"
+        
+        assessor = GeminiAssessment()
+        
+        # Use simple caching or just call every time (Gemini is fast enough)
+        result = assessor.generate_quiz(skills)
+        
+        return jsonify({
+            'success': True,
+            'quiz': result
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
