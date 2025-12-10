@@ -10,10 +10,15 @@ def send_verification_email(mentor_name, company_name, verification_link):
     """
     
     # Configuration as per request
-    sender_email = "whitedevil752006@gmail.com"
+    # Configuration
+    sender_email = os.environ.get('MAIL_USERNAME')
     # In a real scenario, this would be the company_email passed in arguments.
     # For this demo/testing, we force it to the requested email.
     target_email = "ibrahimwani095@gmail.com"
+
+    if not sender_email:
+        print("ERROR: MAIL_USERNAME environment variable not set")
+        return False
     
     subject = f"Verify Employment for {mentor_name}"
     

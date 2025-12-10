@@ -7,38 +7,45 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-profile">
-            <img src="{{ current_user.profile_picture or url_for('static', filename='images/avatar-placeholder.png') }}" 
-                 alt="Profile" class="sidebar-avatar">
+            <img src="{{ current_user.profile_picture or url_for('static', filename='images/avatar-placeholder.png') }}"
+                alt="Profile" class="sidebar-avatar">
             <div class="sidebar-user-info">
                 <h4>{{ current_user.first_name }} {{ current_user.last_name }}</h4>
                 <p>{{ current_user.desired_role or 'Career Returner' }}</p>
             </div>
         </div>
-        
+
         <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard.home') }}" class="sidebar-link {% if request.endpoint == 'dashboard.home' %}active{% endif %}">
+            <a href="{{ url_for('dashboard.home') }}"
+                class="sidebar-link {% if request.endpoint == 'dashboard.home' %}active{% endif %}">
                 <i class="fas fa-home"></i> Dashboard
             </a>
-            <a href="{{ url_for('dashboard.skills') }}" class="sidebar-link {% if request.endpoint == 'dashboard.skills' %}active{% endif %}">
+            <a href="{{ url_for('dashboard.skills') }}"
+                class="sidebar-link {% if request.endpoint == 'dashboard.skills' %}active{% endif %}">
                 <i class="fas fa-graduation-cap"></i> Skills Development
             </a>
-            <a href="{{ url_for('jobs.job_listings') }}" class="sidebar-link {% if 'jobs' in request.endpoint %}active{% endif %}">
+            <a href="{{ url_for('jobs.job_listings') }}"
+                class="sidebar-link {% if 'jobs' in request.endpoint %}active{% endif %}">
                 <i class="fas fa-briefcase"></i> Job Opportunities
             </a>
-            <a href="{{ url_for('mentorship.mentor_list') }}" class="sidebar-link {% if 'mentorship' in request.endpoint %}active{% endif %}">
+            <a href="{{ url_for('mentorship.mentor_list') }}"
+                class="sidebar-link {% if 'mentorship' in request.endpoint %}active{% endif %}">
                 <i class="fas fa-hands-helping"></i> Mentorship
             </a>
-            <a href="{{ url_for('dashboard.community') }}" class="sidebar-link {% if request.endpoint == 'dashboard.community' %}active{% endif %}">
+            <a href="{{ url_for('dashboard.community') }}"
+                class="sidebar-link {% if request.endpoint == 'dashboard.community' %}active{% endif %}">
                 <i class="fas fa-users"></i> Community
             </a>
-            <a href="{{ url_for('dashboard.profile') }}" class="sidebar-link {% if request.endpoint == 'dashboard.profile' %}active{% endif %}">
+            <a href="{{ url_for('dashboard.profile') }}"
+                class="sidebar-link {% if request.endpoint == 'dashboard.profile' %}active{% endif %}">
                 <i class="fas fa-user"></i> My Profile
             </a>
-            <a href="{{ url_for('dashboard.settings') }}" class="sidebar-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
+            <a href="{{ url_for('dashboard.settings') }}"
+                class="sidebar-link {% if request.endpoint == 'dashboard.settings' %}active{% endif %}">
                 <i class="fas fa-cog"></i> Settings
             </a>
         </nav>
-        
+
         <div class="sidebar-progress">
             <h4>Career Comeback Progress</h4>
             <div class="progress">
@@ -68,7 +75,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="sidebar-help">
             <h4>Need Help?</h4>
             <a href="#" class="help-link">
@@ -82,7 +89,7 @@
             </a>
         </div>
     </aside>
-    
+
     <!-- Main Content -->
     <main class="dashboard-content">
         {% block dashboard_content %}{% endblock %}
@@ -92,115 +99,115 @@
 
 {% block extra_css %}
 <style>
-.sidebar-profile {
-    padding: 1.5rem;
-    text-align: center;
-    border-bottom: 1px solid var(--gray-light);
-}
-
-.sidebar-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--primary-light);
-    margin-bottom: 1rem;
-}
-
-.sidebar-user-info h4 {
-    font-size: 1.125rem;
-    margin-bottom: 0.25rem;
-    color: var(--dark-color);
-}
-
-.sidebar-user-info p {
-    color: var(--gray);
-    font-size: 0.875rem;
-}
-
-.sidebar-nav {
-    padding: 1rem;
-}
-
-.progress-milestones {
-    margin-top: 1rem;
-}
-
-.milestone {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-}
-
-.milestone-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--gray-light);
-    flex-shrink: 0;
-}
-
-.milestone-dot.completed {
-    background: var(--success-color);
-}
-
-.milestone-dot.active {
-    background: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
-}
-
-.milestone-label {
-    font-size: 0.875rem;
-    color: var(--gray-dark);
-}
-
-.sidebar-help {
-    padding: 1.5rem;
-    border-top: 1px solid var(--gray-light);
-    margin-top: 1rem;
-}
-
-.sidebar-help h4 {
-    font-size: 1rem;
-    margin-bottom: 0.75rem;
-    color: var(--dark-color);
-}
-
-.help-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0;
-    color: var(--gray-dark);
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: color 0.3s;
-}
-
-.help-link:hover {
-    color: var(--primary-color);
-}
-
-.dashboard-content {
-    padding: 2rem;
-    background-color: #f9fafb;
-    min-height: calc(100vh - 70px);
-    overflow-y: auto;
-}
-
-@media (max-width: 768px) {
-    .dashboard {
-        grid-template-columns: 1fr;
+    .sidebar-profile {
+        padding: 1.5rem;
+        text-align: center;
+        border-bottom: 1px solid var(--gray-light);
     }
-    
-    .sidebar {
-        display: none;
+
+    .sidebar-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--primary-light);
+        margin-bottom: 1rem;
     }
-    
-    .dashboard-content {
+
+    .sidebar-user-info h4 {
+        font-size: 1.125rem;
+        margin-bottom: 0.25rem;
+        color: var(--dark-color);
+    }
+
+    .sidebar-user-info p {
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .sidebar-nav {
         padding: 1rem;
     }
-}
+
+    .progress-milestones {
+        margin-top: 1rem;
+    }
+
+    .milestone {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .milestone-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--gray-light);
+        flex-shrink: 0;
+    }
+
+    .milestone-dot.completed {
+        background: var(--success-color);
+    }
+
+    .milestone-dot.active {
+        background: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
+    }
+
+    .milestone-label {
+        font-size: 0.875rem;
+        color: var(--gray-dark);
+    }
+
+    .sidebar-help {
+        padding: 1.5rem;
+        border-top: 1px solid var(--gray-light);
+        margin-top: 1rem;
+    }
+
+    .sidebar-help h4 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        color: var(--dark-color);
+    }
+
+    .help-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+        color: var(--gray-dark);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.3s;
+    }
+
+    .help-link:hover {
+        color: var(--primary-color);
+    }
+
+    .dashboard-content {
+        padding: 2rem;
+        background-color: #f9fafb;
+        min-height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+            display: none;
+        }
+
+        .dashboard-content {
+            padding: 1rem;
+        }
+    }
 </style>
 {% endblock %}

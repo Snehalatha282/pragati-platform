@@ -32,7 +32,6 @@ from routes.auth import auth_bp
 from routes.dashboard import dashboard_bp
 from routes.jobs import jobs_bp
 from routes.mentorship import mentorship_bp
-from routes.admin import admin_bp
 
 
 
@@ -40,15 +39,14 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(jobs_bp)
 app.register_blueprint(mentorship_bp)
+
+from routes.admin import admin_bp
 app.register_blueprint(admin_bp)
 
 
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        # redirect admins to ADMIN dashboard instead of user dashboard
-        if current_user.role == "admin":
-            return redirect(url_for("admin.dashboard"))
         return redirect(url_for("dashboard.home"))
     return render_template("index.html")
 

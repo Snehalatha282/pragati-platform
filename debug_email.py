@@ -6,15 +6,17 @@ import sys
 from utils.email_demo import send_verification_email
 import re
 
-# Extract sender from file manually to avoid import issues if app context needed
-with open('utils/email_demo.py', 'r') as f:
-    content = f.read()
-    match = re.search(r'sender_email\s*=\s*"([^"]+)"', content)
-    sender = match.group(1) if match else "UNKNOWN"
+# Extract sender from environment variable
+sender = os.environ.get('MAIL_USERNAME')
 
 password = os.environ.get('MAIL_PASSWORD')
 
 print(f"--- Email Debugger ---")
+if not sender:
+    print("ERROR: MAIL_USERNAME environment variable is NOT set.")
+    print("Usage: $env:MAIL_USERNAME='your-email@gmail.com'; $env:MAIL_PASSWORD='your-app-password'; python debug_email.py")
+    sys.exit(1)
+
 print(f"Sender: {sender}")
 
 if not password:

@@ -23,6 +23,11 @@ def login():
                 login_user(user, remember=remember)
                 flash('Logged in successfully!', 'success')
                 next_page = request.args.get('next')
+                
+                # Admin Redirect
+                if user.role == 'admin':
+                    return redirect(url_for('admin.dashboard'))
+                    
                 return redirect(next_page or url_for('dashboard.home'))
             else:
                 flash('Your account is deactivated.', 'error')
